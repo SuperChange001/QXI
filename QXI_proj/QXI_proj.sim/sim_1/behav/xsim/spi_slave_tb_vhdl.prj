@@ -1,0 +1,9 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../../source/spi_slave.vhd" \
+"../../../../../source/hello.vhd" \
+"../../../../../test/spi_slave_tb.vhd" \
+"../../../../../test/hello_tb.vhd" \
+
+# Do not sort compile order
+nosort

@@ -3,4 +3,6 @@
 Oct 19 2021
 02:56:52
 /home/chao/git/QXI/source/hello.vhd,1667510489,vhdl,,,,hello_and_gate,,,,,,,,
-/home/chao/git/QXI/test/hello_tb.vhd,1667510650,vhdl,,,,hello_tb,,,,,,,,
+/home/chao/git/QXI/source/spi_slave.vhd,1671020230,vhdl,,,,spi_slave,,,,,,,,
+/home/chao/git/QXI/test/hello_tb.vhd,1667510652,vhdl,,,,hello_tb,,,,,,,,
+/home/chao/git/QXI/test/spi_slave_tb.vhd,1671017698,vhdl,,,,spi_slave_tb,,,,,,,,

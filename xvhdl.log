@@ -1,2 +1,5 @@
-INFO: [VRFC 10-163] Analyzing VHDL file "/home/chao/git/QXI/test/hello_tb.vhd" into library work
-INFO: [VRFC 10-3107] analyzing entity 'hello_tb'
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/chao/git/HWLib/testbench/fp_linear_1d_tb.vhd" into library work
+INFO: [VRFC 10-3107] analyzing entity 'fp_linear_1d_tb'
+ERROR: [VRFC 10-2987] 'fp_linear_1d' is not compiled in library 'work' [/home/chao/git/HWLib/testbench/fp_linear_1d_tb.vhd:92]
+ERROR: [VRFC 10-3782] unit 'rtl' ignored due to previous errors [/home/chao/git/HWLib/testbench/fp_linear_1d_tb.vhd:22]
+INFO: [VRFC 10-3070] VHDL file '/home/chao/git/HWLib/testbench/fp_linear_1d_tb.vhd' ignored due to errors
