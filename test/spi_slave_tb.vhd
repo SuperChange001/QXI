@@ -9,6 +9,9 @@ use xil_defaultlib.all;
 -----------------------------------------------------------
 
 entity spi_slave_tb is
+generic(
+constant C_CLK_PERIOD : time := 10 ns 
+);
 port(
     clk_s: out std_logic
     );
@@ -20,28 +23,35 @@ architecture testbench of spi_slave_tb is
 
     -- Testbench DUT generics
     procedure mosi_write_byte(
-                            signal   clock  : in std_logic;
                             variable   data   : in std_logic_vector(7 downto 0);
-                            signal   mosi   : out std_logic) is
+                            signal     mosi   : out std_logic;
+                            signal     spi_clk: out std_logic) is
     variable counter:integer:=0;
     begin      
         for i in 0 to 7 loop
             mosi <= data(7-i);
-            wait until clock='0';   
+            wait for C_CLK_PERIOD*0.2;
+            spi_clk <= '1';
+            wait for C_CLK_PERIOD*0.3;
+            spi_clk <= '0';
+            wait for C_CLK_PERIOD*0.5;
         end loop;
         mosi <= '0';
     end procedure;
     
     procedure mosi_read_byte(
-                            signal   clock  : in std_logic;
                             variable   data   : out std_logic_vector(7 downto 0);
-                            signal   miso   : in std_logic) is
+                            signal   miso   : in std_logic;
+                            signal     spi_clk: out std_logic) is
     variable counter:integer:=0;
     begin      
         for i in 0 to 7 loop
-            wait until clock='1';   
+            spi_clk <= '1';
+            wait for C_CLK_PERIOD*0.2;
+            spi_clk <= '0';
+            wait for C_CLK_PERIOD*0.5;
             data(7-i) := miso;
-            wait until clock='0'; 
+            wait for C_CLK_PERIOD*0.3;
         end loop;
         
     end procedure;
@@ -50,7 +60,7 @@ architecture testbench of spi_slave_tb is
     signal spi_slave_reset:std_logic;
     
     -- Other constants
-    constant C_CLK_PERIOD : time := 10 ns;  
+    
     signal reset : std_logic;
     signal clk:std_logic;
     signal spi_slave_sclk : std_logic;
@@ -64,6 +74,7 @@ architecture testbench of spi_slave_tb is
     signal spi_slave_in_en : std_logic;
     type buf_t is array (0 to 10) of std_logic_vector(7 downto 0);
     signal data_buf : buf_t := (others=>(others=>'0'));
+    signal test_read_data : std_logic_vector(7 downto 0);
 begin
     -----------------------------------------------------------
     -- Clocks and Reset
@@ -108,6 +119,7 @@ begin
     begin 
         spi_slave_cs <='1';
         spi_slave_mosi <='0';
+        spi_slave_sclk <= '0';
         wait until reset='0';
 --        mosi_write_byte(clk, command, spi_slave_mosi);
         
@@ -115,43 +127,43 @@ begin
         data := x"80";
         wait until clk='0'; 
         spi_slave_cs<='0';
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write command
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write command
         
         data := x"00";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write address H
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write address H
         
         data := x"00";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write address L
-        
-        data := x"99";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x99 to 0x0000
-        
-        data := x"88";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x88 to 0x0001
-        
-        data := x"77";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x77 to 0x0002
-        
-        data := x"66";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x66 to 0x0003
-
-        data := x"55";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x55 to 0x0004
-        
-        data := x"44";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x44 to 0x0005
-        
-        data := x"33";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x33 to 0x0006
-        
-        data := x"22";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x22 to 0x0007
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write address L
         
         data := x"11";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x11 to 0x0008
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x99 to 0x0000
         
-        data := x"00";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x00 to 0x0009   
+        data := x"22";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x88 to 0x0001
+        
+        data := x"33";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x77 to 0x0002
+        
+        data := x"44";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x66 to 0x0003
+
+        data := x"55";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x55 to 0x0004
+        
+        data := x"66";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x44 to 0x0005
+        
+        data := x"77";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x33 to 0x0006
+        
+        data := x"88";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x22 to 0x0007
+        
+        data := x"99";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x11 to 0x0008
+        
+        data := x"aa";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x00 to 0x0009   
                      
         spi_slave_cs <= '1';
         wait for C_CLK_PERIOD;
@@ -161,26 +173,50 @@ begin
         data := x"40";
         wait until clk='0'; 
         spi_slave_cs<='0';
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write command
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write command
         
         data := x"00";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write address H
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write address H
         
-        data := x"01";
-        mosi_write_byte(clk, data, spi_slave_mosi); -- write address L
+        data := x"00";
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write address L
         
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
         
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
         
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
-        mosi_read_byte(clk, data, spi_slave_miso);
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        wait for C_CLK_PERIOD*2;
 --        data := x"99";
 --        mosi_write_byte(clk, data, spi_slave_mosi); -- write 0x99 to 0x0000
         
@@ -239,7 +275,7 @@ begin
     out_en => spi_slave_out_en,
     in_en => spi_slave_in_en
     );
-    spi_slave_sclk <= clk;
+--    spi_slave_sclk <= clk;
     spi_slave_reset <= not reset;
 
 end architecture testbench;

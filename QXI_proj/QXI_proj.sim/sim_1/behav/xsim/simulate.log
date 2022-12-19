@@ -1,9 +1,0 @@
-Time resolution is 1 ps
-Stopped at time : 1425 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 173
-Stopped at time : 1505 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 174
-Stopped at time : 1585 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 175
-Stopped at time : 2225 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 214
-Stopped at time : 1425 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 173
-Stopped at time : 1265 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 167
-Stopped at time : 1425 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 173
-Stopped at time : 1505 ns : File "/home/chao/git/QXI/test/spi_slave_tb.vhd" Line 174

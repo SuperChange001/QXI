@@ -81,7 +81,10 @@ BEGIN
         else                                                         --this slave is selected
 
             IF(rising_edge(clk)) then                                  --new bit on miso/mosi
-                
+                if command=x"40" and state=s_data then  --write status register to master
+                    miso <= data_in(7-bit_count_var);                  --send transmit register data to master
+                end if;
+            
                 rx_buf_var(7-bit_count_var) := mosi;
                 bit_count_var := bit_count_var+1;
                 
@@ -100,6 +103,7 @@ BEGIN
                         state <= s_data;
                         addr_offset(7 DOWNTO 0) <= rx_buf_var;
                         bytes_counter := 0;
+                        addr <= std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length)); -- increase the address
                     elsif state = s_data then
                         addr <= std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length)); -- increase the address
                         bytes_counter := bytes_counter+1;
@@ -115,10 +119,8 @@ BEGIN
                         out_trigger <= '0';
                 end if;
                 
-            end if;
-            
-            if falling_edge(clk) then
-                miso <= data_in(bit_count_var);                  --send transmit register data to master
+
+                
             end if;
             
         end if;
@@ -143,43 +145,19 @@ BEGIN
     
 --    PROCESS(reset_n, ss_n, clk)
 --    BEGIN
-----        --write address register ('0' for receive, '1' for status)
-----        IF(bit_cnt(1) = '1' AND rising_edge(clk)) THEN
-----            wr_add <= mosi;
-----        END IF;
         
-----        --read address register ('0' for transmit, '1' for status)
-----        IF(bit_cnt(2) = '1' AND rising_edge(clk)) THEN
-----            rd_add <= mosi;
-----        END IF;
-        
---        --receive registers
---        --write to the receive register from master
-----        IF(reset_n = '0') THEN
-----            rx_buf <= (OTHERS => '0');
-----        ELSE
-----            FOR i IN 0 TO 7 LOOP          
-----                IF( bit_cnt(i+1) = '1' AND rising_edge(clk)) THEN
-----                    rx_buf(7-i) <= mosi;
-----                END IF;
-----            END LOOP;
-----        END IF;
-        
---        --transmit registers
---        IF(reset_n = '0') THEN
---            tx_buf <= (OTHERS => '0');
---        ELSE
---            tx_buf <= data_in;
---        END IF;
-
 --        --miso output register
 --        IF(ss_n = '1' OR reset_n = '0') THEN           --no transaction occuring or reset
 --            miso <= 'Z';
 --        ELSIF(rising_edge(clk)) THEN
---            IF command=x"40" and state=s_data THEN  --write status register to master
-                
+--            IF command=x"40" and state=s_dataTHEN  --write status register to master
+--                miso <= data_in(bit_cnt_s);                  --send transmit register data to master
 --            END IF;
 --        END IF;
 --    END PROCESS;
+    
+--    if falling_edge(clk) then
+--        
+--    end if;
 
 END rtl;
