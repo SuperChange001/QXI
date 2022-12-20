@@ -23,8 +23,6 @@ USE ieee.std_logic_1164.all;
 use ieee.numeric_std.all;               -- for type conversions
 
 ENTITY spi_slave IS
-  GENERIC(
-    d_width : INTEGER := 8);     --data width in bits
   PORT(
     reset_n      : IN     STD_LOGIC;  --reset from master
     sclk         : IN     STD_LOGIC;  --spi clk from master
@@ -32,11 +30,14 @@ ENTITY spi_slave IS
     mosi         : IN     STD_LOGIC;  --master out, slave in
     miso         : OUT    STD_LOGIC := ('Z'); --master in, slave out
     
+    -- Parallel interface to control the skeleton
     addr         : OUT    STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
-    data_out     : OUT    STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
-    data_in      : IN     STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --logic provide data to transmit register
+    
     out_en       : OUT    STD_LOGIC;
-    in_en        : OUT    STD_LOGIC
+    data_out     : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
+     
+    in_en        : OUT    STD_LOGIC;
+    data_in      : IN     STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0')  --logic provide data to transmit register
     );
     
 END spi_slave;
@@ -46,9 +47,9 @@ ARCHITECTURE rtl OF spi_slave IS
     SIGNAL clk     : STD_LOGIC;  --clock
     SIGNAL bit_cnt_s : integer;  --'1' for active transaction bit
 
-    SIGNAL rx_buf  : STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
-    SIGNAL tx_buf  : STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --transmit buffer
-    SIGNAL command  : STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
+    SIGNAL rx_buf  : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
+    SIGNAL tx_buf  : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --transmit buffer
+    SIGNAL command  : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
     
     TYPE STATE_TYPE IS (s_idle, s_cmd, s_addr_h, s_addr_l, s_data);
     SIGNAL state   : STATE_TYPE;
@@ -57,20 +58,12 @@ ARCHITECTURE rtl OF spi_slave IS
     signal out_trigger : std_logic;
     
 BEGIN
-    
---    addr <= addr_s;
-    ----adjust clock so writes are on rising edge and reads on falling edge
-    --mode <= cpol XOR cpha;  --'1' for modes that write on rising edge
-
-    --WITH mode SELECT
-    --    clk <= sclk WHEN '1',
-    --        NOT sclk WHEN OTHERS;
 
     clk <= sclk;
 
     --keep track of miso/mosi bit counts for data alignmnet
     process(ss_n, clk)
-    variable rx_buf_var : STD_LOGIC_VECTOR(d_width-1 DOWNTO 0) := (OTHERS => '0');
+    variable rx_buf_var : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
     variable bit_count_var : integer range 0 to 8;
     variable bytes_counter : integer range 0 to 1023;
     begin
@@ -142,22 +135,5 @@ BEGIN
                 end if;
             end if;
     end process;
-    
---    PROCESS(reset_n, ss_n, clk)
---    BEGIN
-        
---        --miso output register
---        IF(ss_n = '1' OR reset_n = '0') THEN           --no transaction occuring or reset
---            miso <= 'Z';
---        ELSIF(rising_edge(clk)) THEN
---            IF command=x"40" and state=s_dataTHEN  --write status register to master
---                miso <= data_in(bit_cnt_s);                  --send transmit register data to master
---            END IF;
---        END IF;
---    END PROCESS;
-    
---    if falling_edge(clk) then
---        
---    end if;
 
 END rtl;
