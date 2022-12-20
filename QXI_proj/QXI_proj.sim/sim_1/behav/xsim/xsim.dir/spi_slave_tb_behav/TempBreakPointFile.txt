@@ -1,2 +1,0 @@
-Breakpoint File Version 1.0
-259,true,"/home/chao/git/QXI/test/spi_slave_tb.vhd"

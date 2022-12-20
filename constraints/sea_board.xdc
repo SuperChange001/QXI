@@ -1,28 +1,28 @@
-set_property PACKAGE_PIN H4 [get_ports clk_100]
-set_property IOSTANDARD LVCMOS33 [get_ports clk_100]
-create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_ports clk_100]
+set_property PACKAGE_PIN H4 [get_ports sys_clk]
+set_property IOSTANDARD LVCMOS33 [get_ports sys_clk]
+create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_ports sys_clk]
 
-#set_property IOSTANDARD LVCMOS33 [get_ports rst_n] 
-#set_property PACKAGE_PIN M13  [get_ports rst_n]
+
 
 #  SPI
-#set_property IOSTANDARD LVCMOS33 [get_ports spi_fss]
-#set_property PACKAGE_PIN P12  [get_ports spi_fss]
+set_property -dict { PACKAGE_PIN N14 IOSTANDARD LVCMOS33 } [get_ports { spi_clk }]; # io0
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets spi_clk]
+set_property -dict { PACKAGE_PIN M14 IOSTANDARD LVCMOS33 } [get_ports { spi_ss_n }];# io1
 
-#set_property IOSTANDARD LVCMOS33 [get_ports spi_clk]
-#set_property PACKAGE_PIN N11 [get_ports spi_clk]
-
-#set_property IOSTANDARD LVCMOS33 [get_ports spi_in]
-#set_property PACKAGE_PIN P11  [get_ports spi_in]
-
-#set_property IOSTANDARD LVCMOS33 [get_ports spi_out]
-#set_property PACKAGE_PIN M12  [get_ports spi_out]
+set_property -dict { PACKAGE_PIN C4 IOSTANDARD LVCMOS33 } [get_ports { spi_mosi }]; # io2
+set_property -dict { PACKAGE_PIN B13 IOSTANDARD LVCMOS33 } [get_ports { spi_miso }];# io3
 
 set_property IOSTANDARD LVCMOS33 [get_ports leds[1]]
 set_property PACKAGE_PIN J1  [get_ports leds[1]]
 
 set_property IOSTANDARD LVCMOS33 [get_ports leds[2]]
 set_property PACKAGE_PIN A13  [get_ports leds[2]]
+
+set_property -dict { PACKAGE_PIN E11 IOSTANDARD LVCMOS33 } [get_ports { leds[0] }];
+set_property -dict { PACKAGE_PIN J1 IOSTANDARD LVCMOS33 } [get_ports { leds[1] }];
+set_property -dict { PACKAGE_PIN A13 IOSTANDARD LVCMOS33 } [get_ports { leds[2] }];
+set_property -dict { PACKAGE_PIN C3 IOSTANDARD LVCMOS33 } [get_ports { leds[3] }];
+
 
 ## Configuration options, can be used for all designs
 set_property BITSTREAM.CONFIG.CONFIGRATE 66 [current_design]

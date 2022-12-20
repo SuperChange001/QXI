@@ -31,13 +31,13 @@ ENTITY spi_slave IS
     miso         : OUT    STD_LOGIC := ('Z'); --master in, slave out
     
     -- Parallel interface to control the skeleton
-    addr         : OUT    STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
+    addr         : OUT    STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');  -- which address of the user logic to read/write
     
-    out_en       : OUT    STD_LOGIC;
-    data_out     : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --receive register output to logic
+    we           : OUT    STD_LOGIC;    -- enable writing to user logic
+    data_wr     : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  -- data writing to user logic
      
-    in_en        : OUT    STD_LOGIC;
-    data_in      : IN     STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0')  --logic provide data to transmit register
+    re        : OUT    STD_LOGIC;
+    data_rd      : IN     STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0')  --logic provide data to transmit register
     );
     
 END spi_slave;
@@ -75,7 +75,7 @@ BEGIN
 
             IF(rising_edge(clk)) then                                  --new bit on miso/mosi
                 if command=x"40" and state=s_data then  --write status register to master
-                    miso <= data_in(7-bit_count_var);                  --send transmit register data to master
+                    miso <= data_rd(7-bit_count_var);                  --send transmit register data to master
                 end if;
             
                 rx_buf_var(7-bit_count_var) := mosi;
@@ -87,7 +87,7 @@ BEGIN
                         command <= rx_buf_var;
                         state <= s_addr_h;
                         if rx_buf_var=x"40" then
-                            in_en <= '1';
+                            re <= '1';
                         end if;
                     elsif state = s_addr_h then
                         addr_offset(15 DOWNTO 8) <= rx_buf_var;
@@ -100,7 +100,7 @@ BEGIN
                     elsif state = s_data then
                         addr <= std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length)); -- increase the address
                         bytes_counter := bytes_counter+1;
-                        data_out <= rx_buf_var;
+                        data_wr <= rx_buf_var;
                         if command=x"80" then
                             out_trigger <= '1';
                         end if;
@@ -123,17 +123,19 @@ BEGIN
     process(reset_n, clk, out_trigger)
     variable timer_down:integer range 0 to 4;
     begin
-            if reset_n='0' then
-                out_en <= '0';
-            elsif(rising_edge(out_trigger)) then
-                out_en <= '1';
+        if reset_n='0' then
+            we <= '0';
+        elsif(falling_edge(clk)) then
+            if out_trigger='1' then
+                we <= '1';
                 timer_down := 4;
-            elsif(falling_edge(clk)) then 
+            else
                 timer_down := timer_down-1;
                 if timer_down=0 then
-                    out_en <= '0';
+                    we <= '0';
                 end if;
             end if;
+        end if;
     end process;
 
 END rtl;

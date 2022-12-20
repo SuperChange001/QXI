@@ -1,3 +1,24 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 12/20/2022 02:43:26 PM
+-- Design Name: 
+-- Module Name: env5_top_tb - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -6,20 +27,16 @@ use ieee.std_logic_textio.all;
 
 library xil_defaultlib;
 use xil_defaultlib.all;
------------------------------------------------------------
 
-entity spi_slave_tb is
+entity env5_top_tb is
 generic(
 constant C_CLK_PERIOD : time := 10 ns 
 );
 port(
     clk_s: out std_logic
-    );
-end entity ;
+    );end env5_top_tb;
 
------------------------------------------------------------
-
-architecture testbench of spi_slave_tb is
+architecture Behavioral of env5_top_tb is
 
     -- Testbench DUT generics
     procedure mosi_write_byte(
@@ -72,9 +89,9 @@ architecture testbench of spi_slave_tb is
     signal spi_slave_data_in : std_logic_vector(7 downto 0);
     signal spi_slave_out_en : std_logic;
     signal spi_slave_in_en : std_logic;
-    type buf_t is array (0 to 10) of std_logic_vector(7 downto 0);
-    signal data_buf : buf_t := (others=>(others=>'0'));
+
     signal test_read_data : std_logic_vector(7 downto 0);
+    signal test_leds : std_logic_vector(3 downto 0);
 begin
     -----------------------------------------------------------
     -- Clocks and Reset
@@ -95,21 +112,6 @@ begin
                  '0' after 5*C_CLK_PERIOD;
         wait;
     end process RESET_GEN;
-    
-    BUF_GEN : process(clk)
-    begin
-        if rising_edge(clk) then
-            if spi_slave_out_en='1' then
-                data_buf(to_integer(unsigned(spi_slave_addr))) <= spi_slave_data_out;
-            end if;
-            
-        end if;
-        if falling_edge(clk) then
-            if spi_slave_in_en='1' then
-                spi_slave_data_in <= data_buf(to_integer(unsigned(spi_slave_addr)));
-            end if;
-        end if;
-    end process;
 
     -----------------------------------------------------------
     -- Testbench Stimulus
@@ -122,7 +124,7 @@ begin
         spi_slave_sclk <= '0';
         wait until reset='0';
         
-        wait for C_CLK_PERIOD*3.51;
+        wait for C_CLK_PERIOD*40965;
         data := x"80";
         wait until clk='0'; 
         spi_slave_cs<='0';
@@ -225,20 +227,16 @@ begin
     -----------------------------------------------------------
     -- Entity Under Test
     -----------------------------------------------------------
-    uut: entity xil_defaultlib.spi_slave(rtl)
+    uut: entity xil_defaultlib.env5_top(rtl)
     port map(
-    reset_n => spi_slave_reset,
-    sclk => spi_slave_sclk,
-    ss_n => spi_slave_cs,
-    mosi => spi_slave_mosi,
-    miso => spi_slave_miso,
-    addr => spi_slave_addr,
-    data_wr => spi_slave_data_out,
-    data_rd => spi_slave_data_in,
-    we => spi_slave_out_en,
-    re => spi_slave_in_en
-    );
---    spi_slave_sclk <= clk;
-    spi_slave_reset <= not reset;
+    sys_clk => clk,
 
-end architecture testbench;
+    spi_clk => spi_slave_sclk,
+    spi_ss_n => spi_slave_cs,
+    spi_mosi => spi_slave_mosi,
+    spi_miso => spi_slave_miso,
+    
+    leds => test_leds
+   );
+
+end Behavioral;
