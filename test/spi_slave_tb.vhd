@@ -30,13 +30,13 @@ architecture testbench of spi_slave_tb is
     begin      
         for i in 0 to 7 loop
             mosi <= data(7-i);
-            wait for C_CLK_PERIOD*0.2;
             spi_clk <= '1';
-            wait for C_CLK_PERIOD*0.3;
+            wait for C_CLK_PERIOD*0.5;
             spi_clk <= '0';
             wait for C_CLK_PERIOD*0.5;
         end loop;
         mosi <= '0';
+        wait for C_CLK_PERIOD*1;
     end procedure;
     
     procedure mosi_read_byte(
@@ -47,13 +47,13 @@ architecture testbench of spi_slave_tb is
     begin      
         for i in 0 to 7 loop
             spi_clk <= '1';
-            wait for C_CLK_PERIOD*0.2;
-            spi_clk <= '0';
             wait for C_CLK_PERIOD*0.5;
-            data(7-i) := miso;
+            spi_clk <= '0';
             wait for C_CLK_PERIOD*0.3;
+            data(7-i) := miso;
+            wait for C_CLK_PERIOD*0.2;
         end loop;
-        
+        wait for C_CLK_PERIOD*1;
     end procedure;
     
     -- Testbench DUT ports
@@ -162,8 +162,7 @@ begin
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x11 to 0x0008
         
         data := x"aa";
-        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x00 to 0x0009   
-                     
+        mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x00 to 0x0009              
         spi_slave_cs <= '1';
         wait for C_CLK_PERIOD;
         
@@ -232,6 +231,7 @@ begin
     ss_n => spi_slave_cs,
     mosi => spi_slave_mosi,
     miso => spi_slave_miso,
+    clk => clk,
     addr => spi_slave_addr,
     data_wr => spi_slave_data_out,
     data_rd => spi_slave_data_in,

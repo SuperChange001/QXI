@@ -28,8 +28,9 @@ ENTITY spi_slave IS
     sclk         : IN     STD_LOGIC;  --spi clk from master
     ss_n         : IN     STD_LOGIC;  --active low slave select
     mosi         : IN     STD_LOGIC;  --master out, slave in
-    miso         : OUT    STD_LOGIC := ('Z'); --master in, slave out
+    miso         : OUT    STD_LOGIC; --master in, slave out
     
+    clk          : in std_logic;
     -- Parallel interface to control the skeleton
     addr         : OUT    STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');  -- which address of the user logic to read/write
     
@@ -44,7 +45,6 @@ END spi_slave;
 
 ARCHITECTURE rtl OF spi_slave IS
     SIGNAL mode    : STD_LOGIC;  --groups modes by clock polarity relation to data
-    SIGNAL clk     : STD_LOGIC;  --clock
     SIGNAL bit_cnt_s : integer;  --'1' for active transaction bit
 
     SIGNAL rx_buf  : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
@@ -59,10 +59,9 @@ ARCHITECTURE rtl OF spi_slave IS
     
 BEGIN
 
-    clk <= sclk;
 
     --keep track of miso/mosi bit counts for data alignmnet
-    process(ss_n, clk)
+    process(ss_n, sclk, reset_n)
     variable rx_buf_var : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
     variable bit_count_var : integer range 0 to 8;
     variable bytes_counter : integer range 0 to 1023;
@@ -71,12 +70,10 @@ BEGIN
             state <= s_idle;
             out_trigger <= '0';
             bit_count_var := 0;
+            re <= '0';
         else                                                         --this slave is selected
 
-            IF(rising_edge(clk)) then                                  --new bit on miso/mosi
-                if command=x"40" and state=s_data then  --write status register to master
-                    miso <= data_rd(7-bit_count_var);                  --send transmit register data to master
-                end if;
+            IF(falling_edge(sclk)) then                                  --new bit on miso/mosi
             
                 rx_buf_var(7-bit_count_var) := mosi;
                 bit_count_var := bit_count_var+1;
@@ -105,7 +102,7 @@ BEGIN
                             out_trigger <= '1';
                         end if;
                      end if;
-                elsif bit_count_var=1 then
+                elsif bit_count_var=2 then
                         if state = s_idle then
                             state <= s_cmd;
                         end if;
@@ -120,21 +117,39 @@ BEGIN
         bit_cnt_s <= bit_count_var;
     end process;
     
+    process(sclk,ss_n,reset_n)
+    begin
+        if(ss_n = '1' or reset_n = '0') then                         --this slave is not selected or being reset
+            miso <= '0';
+        else
+            if rising_edge(sclk) then
+                     if command=x"40" and state=s_data then  --write status register to master
+                        miso <= data_rd(7-bit_cnt_s);                  --send transmit register data to master
+                     else
+                        miso <= '0';
+                     end if;
+                 end if;
+               
+        end if;
+    end process;
+    
+    
     process(reset_n, clk, out_trigger)
     variable timer_down:integer range 0 to 4;
     begin
         if reset_n='0' then
             we <= '0';
-        elsif(falling_edge(clk)) then
+        elsif(rising_edge(clk)) then
+        
             if out_trigger='1' then
                 we <= '1';
                 timer_down := 4;
-            else
-                timer_down := timer_down-1;
-                if timer_down=0 then
-                    we <= '0';
-                end if;
+             end if;
+            timer_down := timer_down-1;
+            if timer_down=0 then
+                we <= '0';
             end if;
+           
         end if;
     end process;
 

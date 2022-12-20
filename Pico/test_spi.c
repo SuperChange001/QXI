@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
 #include "hardware/spi.h"
+#include <stdlib.h>
 
 #define ENv5_SPI spi0
 #define ENv5_SPI_RX_PIN 16 // MISO
@@ -52,23 +53,24 @@ void spi_data_send(spi_inst_t *spi, uint cs_pin, uint16_t addr, uint8_t data[], 
 }
 
 void printbuf(uint8_t *buf, int16_t len) {
-    for (int i = 0; i < len; ++i) {
-        if (i % 16 == 15)
-            printf("%02x\n", buf[i]);
-        else
-            printf("%02x ", buf[i]);
+    for (int i = 0; i < len; i++) {
+        printf("%02x ", buf[i]);
     }
+    printf("\r\n");
 }
-
+uint8_t dat_sent[14];
+uint8_t dat_reciev[14];
 int main()
 {
     stdio_init_all();
     
 
     // Enable SPI 0 at 1 MHz and connect to GPIOs
+
+    spi_init(ENv5_SPI, 100 * 1000);
+    sleep_ms(1);
     spi_set_format(ENv5_SPI, 8, SPI_CPOL_0, SPI_CPHA_1, SPI_MSB_FIRST);
-    spi_init(ENv5_SPI, 1000 * 1000);
-    
+    sleep_ms(1);
     gpio_set_function(ENv5_SPI_RX_PIN, GPIO_FUNC_SPI);
     gpio_set_function(ENv5_SPI_TX_PIN, GPIO_FUNC_SPI);
     gpio_set_function(ENv5_SPI_SCK_PIN, GPIO_FUNC_SPI);
@@ -100,16 +102,19 @@ int main()
         }
         if(c =='w')
         {
-            printf("Start write data to the FPGA.\r\n");
-            uint8_t dat[] = {1,2,3,4,5,6,7,8};
-            spi_data_send(ENv5_SPI, ENv5_SPI_CS_PIN, 0x0000, dat, 4);
-            printf("Done write data to the FPGA.\r\n");
+//            printf("Start write data to the FPGA.\r\n");
+
+            for(int i=0;i<14;i++)
+                dat_sent[i] = rand()%256;
+            spi_data_send(ENv5_SPI, ENv5_SPI_CS_PIN, 0x0000, dat_sent, 14);
+            printbuf(dat_sent, 14);
         }
         if(c=='r')
         {
-            uint8_t dat[10] = {0,0,0,0,0,0,0,0,0,0};
-            spi_data_read(ENv5_SPI, ENv5_SPI_CS_PIN, 0x0000, dat, 10);
-            printbuf(dat, 10);
+
+            spi_data_read(ENv5_SPI, ENv5_SPI_CS_PIN, 0x0000, dat_reciev, 14);
+            printbuf(dat_sent, 14);
+            printf("=========\r\n");
         }
     }
 

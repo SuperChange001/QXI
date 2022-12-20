@@ -47,13 +47,13 @@ architecture Behavioral of env5_top_tb is
     begin      
         for i in 0 to 7 loop
             mosi <= data(7-i);
-            wait for C_CLK_PERIOD*0.2;
             spi_clk <= '1';
-            wait for C_CLK_PERIOD*0.3;
+            wait for C_CLK_PERIOD*0.5;
             spi_clk <= '0';
             wait for C_CLK_PERIOD*0.5;
         end loop;
         mosi <= '0';
+        wait for C_CLK_PERIOD*1;
     end procedure;
     
     procedure mosi_read_byte(
@@ -64,15 +64,15 @@ architecture Behavioral of env5_top_tb is
     begin      
         for i in 0 to 7 loop
             spi_clk <= '1';
-            wait for C_CLK_PERIOD*0.2;
-            spi_clk <= '0';
             wait for C_CLK_PERIOD*0.5;
-            data(7-i) := miso;
+            spi_clk <= '0';
             wait for C_CLK_PERIOD*0.3;
+            data(7-i) := miso;
+            wait for C_CLK_PERIOD*0.2;
         end loop;
-        
+        wait for C_CLK_PERIOD*1;
     end procedure;
-    
+        
     -- Testbench DUT ports
     signal spi_slave_reset:std_logic;
     

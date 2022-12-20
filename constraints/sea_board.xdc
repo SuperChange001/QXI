@@ -12,16 +12,14 @@ set_property -dict { PACKAGE_PIN M14 IOSTANDARD LVCMOS33 } [get_ports { spi_ss_n
 set_property -dict { PACKAGE_PIN C4 IOSTANDARD LVCMOS33 } [get_ports { spi_mosi }]; # io2
 set_property -dict { PACKAGE_PIN B13 IOSTANDARD LVCMOS33 } [get_ports { spi_miso }];# io3
 
-set_property IOSTANDARD LVCMOS33 [get_ports leds[1]]
-set_property PACKAGE_PIN J1  [get_ports leds[1]]
 
-set_property IOSTANDARD LVCMOS33 [get_ports leds[2]]
-set_property PACKAGE_PIN A13  [get_ports leds[2]]
-
-set_property -dict { PACKAGE_PIN E11 IOSTANDARD LVCMOS33 } [get_ports { leds[0] }];
+set_property -dict { PACKAGE_PIN P5 IOSTANDARD LVCMOS33 } [get_ports { leds[0] }];
 set_property -dict { PACKAGE_PIN J1 IOSTANDARD LVCMOS33 } [get_ports { leds[1] }];
-set_property -dict { PACKAGE_PIN A13 IOSTANDARD LVCMOS33 } [get_ports { leds[2] }];
-set_property -dict { PACKAGE_PIN C3 IOSTANDARD LVCMOS33 } [get_ports { leds[3] }];
+set_property -dict { PACKAGE_PIN A13 IOSTANDARD LVCMOS33 } [get_ports { leds[2] }]; # io8
+set_property -dict { PACKAGE_PIN E11 IOSTANDARD LVCMOS33 } [get_ports { leds[3] }]; # io9
+
+
+
 
 
 ## Configuration options, can be used for all designs

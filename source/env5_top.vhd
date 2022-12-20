@@ -46,10 +46,14 @@ architecture rtl of env5_top is
     signal address : std_logic_vector(15 downto 0);
     signal tx_data, rx_data : std_logic_vector(7 downto 0);
     signal tx_en, rx_en : std_logic;
+    signal spi_miso_s : std_logic;
 begin
 
-leds <= b"1110";
+leds(0) <= spi_miso_s; --io8
+leds(3) <= not spi_miso_s; --io9
 
+leds(1) <= tx_en;
+leds(2) <= rx_en;
 spi_reset_process: process(sys_clk, spi_reset_n)
     variable reset_counting : integer range 0 to 40960 := 0;
 begin
@@ -83,13 +87,16 @@ port map(
     sclk => spi_clk,
     ss_n => spi_ss_n,
     mosi => spi_mosi,
-    miso => spi_miso,
+    miso => spi_miso_s,
+    clk => sys_clk,
     addr => address,
     data_wr => tx_data,
     data_rd => rx_data,
     we => tx_en,
     re => rx_en
 );
+spi_miso <= spi_miso_s;
 
+--rx_data <= x"aa";
 
 end rtl;
