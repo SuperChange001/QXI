@@ -1,3 +1,5 @@
+set_property part xc7s6ftgb196-2 [current_project]
+
 set_property PACKAGE_PIN H4 [get_ports sys_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports sys_clk]
 create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_ports sys_clk]
@@ -17,8 +19,6 @@ set_property -dict { PACKAGE_PIN P5 IOSTANDARD LVCMOS33 } [get_ports { leds[0] }
 set_property -dict { PACKAGE_PIN J1 IOSTANDARD LVCMOS33 } [get_ports { leds[1] }];
 set_property -dict { PACKAGE_PIN A13 IOSTANDARD LVCMOS33 } [get_ports { leds[2] }]; # io8
 set_property -dict { PACKAGE_PIN E11 IOSTANDARD LVCMOS33 } [get_ports { leds[3] }]; # io9
-
-
 
 
 

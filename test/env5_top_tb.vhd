@@ -136,34 +136,34 @@ begin
         data := x"00";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write address L
         
-        data := x"11";
+        data := x"09";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x99 to 0x0000
         
-        data := x"22";
+        data := x"08";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x88 to 0x0001
         
-        data := x"33";
+        data := x"07";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x77 to 0x0002
         
-        data := x"44";
+        data := x"06";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x66 to 0x0003
 
-        data := x"55";
+        data := x"05";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x55 to 0x0004
         
-        data := x"66";
+        data := x"04";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x44 to 0x0005
         
-        data := x"77";
+        data := x"03";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x33 to 0x0006
         
-        data := x"88";
+        data := x"02";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x22 to 0x0007
         
-        data := x"99";
+        data := x"01";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x11 to 0x0008
         
-        data := x"aa";
+        data := x"00";
         mosi_write_byte(data, spi_slave_mosi, spi_slave_sclk); -- write 0x00 to 0x0009   
                      
         spi_slave_cs <= '1';
@@ -185,38 +185,49 @@ begin
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
-        wait for C_CLK_PERIOD*2;
-        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
-        test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
-        wait for C_CLK_PERIOD*2;
-        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
-        test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
+        test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
+        wait for C_CLK_PERIOD*2;
+        mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
+        test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk); 
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
         
         mosi_read_byte(data, spi_slave_miso, spi_slave_sclk);
         test_read_data <= data;
+        report "The value of 'read out' is " & integer'image(to_integer((unsigned(data))));
         wait for C_CLK_PERIOD*2;
                      
         spi_slave_cs <= '1';

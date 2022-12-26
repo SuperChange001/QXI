@@ -18,11 +18,11 @@ pico_sdk_init()
 
 if (TARGET tinyusb_device)
 
+    # creates env5_test executable
     add_executable(test_spi test_spi.c)
-
+    target_include_directories(test_spi PUBLIC .)
     # Pull in our pico_stdlib which aggregates commonly used features
     target_link_libraries(test_spi pico_stdlib hardware_spi)
-
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(test_spi 1)
