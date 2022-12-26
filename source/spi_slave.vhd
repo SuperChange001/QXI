@@ -53,8 +53,7 @@ architecture rtl OF spi_slave is
     
     type state_t is (s_idle, s_cmd, s_addr_h, s_addr_l, s_data);
     signal state   : state_t;
-    signal addr_offset : std_logic_vector(15 downto 0) := (others => '0');
-    signal addr_s : std_logic_vector(15 downto 0) := (others => '0');
+    
     signal addr_read, addr_write : std_logic_vector(15 downto 0) := (others => '0');
     signal out_trigger : std_logic;
     
@@ -73,6 +72,7 @@ BEGIN
     variable bit_count_var : integer range 0 to 8;
     variable bytes_counter : integer range 0 to 1023;
     variable addr_to_write_var : std_logic_vector(15 downto 0) := (others => '0');
+    variable addr_offset_var : std_logic_vector(15 downto 0) := (others => '0');
     begin
         if(ss_n = '1' or reset_n = '0') then                         --this slave is not selected or being reset
             state <= s_idle;
@@ -95,19 +95,19 @@ BEGIN
                             re_s <= '1';
                         end if;
                     elsif state = s_addr_h then
-                        addr_offset(15 downto 8) <= rx_buf_var;
+                        addr_offset_var(15 downto 8) := rx_buf_var;
                         state <= s_addr_l;
                     elsif state = s_addr_l then
                         state <= s_data;
-                        addr_offset(7 downto 0) <= rx_buf_var;
+                        addr_offset_var(7 downto 0) := rx_buf_var;
                         
-                        addr_read <= std_logic_vector(unsigned(addr_offset)); -- first addr
-                        addr_to_write_var := std_logic_vector(unsigned(addr_offset));
+                        addr_read <= std_logic_vector(unsigned(addr_offset_var)); -- first addr
+                        addr_to_write_var := std_logic_vector(unsigned(addr_offset_var));
                         addr_write <= addr_to_write_var;
                         bytes_counter := 1;
                     elsif state = s_data then
                         addr_write <= addr_to_write_var;
-                        addr_to_write_var := std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length)); -- increase the address
+                        addr_to_write_var := std_logic_vector(unsigned(addr_offset_var)+to_unsigned(bytes_counter,addr'length)); -- increase the address
                         bytes_counter := bytes_counter+1;
                         data_wr <= rx_buf_var;
                         if command=x"80" then
@@ -121,7 +121,7 @@ BEGIN
                         out_trigger <= '0';
                 elsif bit_count_var=1 then
                     if command=x"40" then
-                        addr_read <= std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length));
+                        addr_read <= std_logic_vector(unsigned(addr_offset_var)+to_unsigned(bytes_counter,addr'length));
                     end if;
                 end if;
             end if;
