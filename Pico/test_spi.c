@@ -166,6 +166,7 @@ void spi_data_read(spi_inst_t *spi, uint cs_pin, uint16_t addr, uint8_t *buf, si
             addr
     };
     spi_write_blocking(spi, cmdbuf, 3);
+    sleep_us(100);
     spi_read_blocking(spi, 0, buf, len);
     cs_deselect(cs_pin);
 }
@@ -178,6 +179,7 @@ void spi_data_send(spi_inst_t *spi, uint cs_pin, uint16_t addr, uint8_t data[], 
     };
     cs_select(cs_pin);
     spi_write_blocking(spi, cmdbuf, 3);
+    sleep_us(100);
     spi_write_blocking(spi, data, len);
     cs_deselect(cs_pin);
 
@@ -195,17 +197,16 @@ int main()
 {
 
     fpga_flash_spi_deinit();
-
-
     fpga_reset_init();
     leds_init();
     fpga_powers_init();
     fpga_reset(0);
     sleep_ms(100);
-//    fpga_powers_on();
-//    sleep_ms(100);
+    fpga_powers_on();
+    sleep_ms(100);
+    fpga_powers_off();
     // Enable SPI 0 at 1 MHz and connect to GPIOs
-    spi_init(ENv5_SPI, 100 * 1000);
+    spi_init(ENv5_SPI, 64000 * 1000);
     sleep_ms(1);
     spi_set_format(ENv5_SPI, 8, SPI_CPOL_0, SPI_CPHA_1, SPI_MSB_FIRST);
     sleep_ms(1);
@@ -255,8 +256,9 @@ int main()
             {
                 for(int i=0;i<14;i++)
                     dat_sent[i] = rand()%256;
+                spi_set_baudrate(ENv5_SPI,100000 * 1000);
                 spi_data_send(ENv5_SPI, ENv5_SPI_CS_PIN, 0x0000, dat_sent, 14);
-
+                spi_set_baudrate(ENv5_SPI,62000 * 1000);
                 spi_data_read(ENv5_SPI, ENv5_SPI_CS_PIN, 0x0000, dat_recv, 14);
                 bool err_flag = false;
                 for(int i=0;i<14;i++)

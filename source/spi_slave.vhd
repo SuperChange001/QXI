@@ -22,55 +22,57 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;               -- for type conversions
 
-entity spi_slave IS
-port(
-    reset_n      : in     std_logic;  --reset from master
-    sclk         : in     std_logic;  --spi clk from master
-    ss_n         : in     std_logic;  --active low slave select
-    mosi         : in     std_logic;  --master out, slave in
-    miso         : OUT    std_logic; --master in, slave out
+entity spi_slave is
+  port(
+    reset_n      : in    std_logic;  --reset from master
+    sclk         : in    std_logic;  --spi clk from master
+    ss_n         : in    std_logic;  --active low slave select
+    mosi         : in    std_logic;  --master out, slave in
+    miso         : out    std_logic; --master in, slave out
     
     clk          : in std_logic;
     -- Parallel interface to control the skeleton
-    addr         : OUT    std_logic_vector(15 DOWNTO 0) := (OTHERS => '0');  -- which address of the user logic to read/write
+    addr         : out    std_logic_vector(15 downto 0) := (others => '0');  -- which address of the user logic to read/write
     
-    we           : OUT    std_logic;    -- enable writing to user logic
-    data_wr     : OUT    std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');  -- data writing to user logic
-    re        : OUT    std_logic;
-    data_rd      : in     std_logic_vector(7 DOWNTO 0) := (OTHERS => '0')  --logic provide data to transmit register
-);
-
-END spi_slave;
-
-ARCHITECTURE rtl OF spi_slave IS
-    SIGNAL mode    : std_logic;  --groups modes by clock polarity relation to data
-    SIGNAL bit_cnt_s : integer;  --'1' for active transaction bit
-
-    SIGNAL rx_buf  : std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
-    SIGNAL tx_buf  : std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');  --transmit buffer
-    SIGNAL command  : std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');  --receiver buffer
+    we           : out    std_logic;    -- enable writing to user logic
+    data_wr     : out    std_logic_vector(7 downto 0) := (others => '0');  -- data writing to user logic
+     
+    re        : out    std_logic;
+    data_rd      : in    std_logic_vector(7 downto 0) := (others => '0')  --logic provide data to transmit register
+    );
     
-    TYPE state_type IS (s_idle, s_cmd, s_addr_h, s_addr_l, s_data);
-    SIGNAL state   : state_type;
-    SIGNAL addr_offset : std_logic_vector(15 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL addr_s : std_logic_vector(15 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL addr_read, addr_write : std_logic_vector(15 DOWNTO 0) := (OTHERS => '0');
+end spi_slave;
+
+architecture rtl OF spi_slave is
+    signal mode    : std_logic;  --groups modes by clock polarity relation to data
+    signal bit_cnt_s : integer;  --'1' for active transaction bit
+
+    signal rx_buf  : std_logic_vector(7 downto 0) := (others => '0');  --receiver buffer
+    signal tx_buf  : std_logic_vector(7 downto 0) := (others => '0');  --transmit buffer
+    signal command  : std_logic_vector(7 downto 0) := (others => '0');  --receiver buffer
+    
+    type state_t is (s_idle, s_cmd, s_addr_h, s_addr_l, s_data);
+    signal state   : state_t;
+    signal addr_offset : std_logic_vector(15 downto 0) := (others => '0');
+    signal addr_s : std_logic_vector(15 downto 0) := (others => '0');
+    signal addr_read, addr_write : std_logic_vector(15 downto 0) := (others => '0');
     signal out_trigger : std_logic;
     
     signal re_s, we_s : std_logic;
     
-BEGin
-    re <= re_s;
-    we <= we_s;
-    
-    addr <= addr_read when re_s='1' else
-            addr_write when we_s='1';
+BEGIN
+   re <= re_s;
+   we <= we_s;
+   
+   addr <= addr_read when re_s='1' else
+           addr_write when we_s='1';
 
-    --keep track of miso/mosi bit counts for data alignmnet
+    --keep track of miso/mosi bit counts for data alignment
     process(ss_n, sclk, reset_n)
-    variable rx_buf_var : std_logic_vector(7 DOWNTO 0) := (OTHERS => '0');
+    variable rx_buf_var : std_logic_vector(7 downto 0) := (others => '0');
     variable bit_count_var : integer range 0 to 8;
     variable bytes_counter : integer range 0 to 1023;
+    variable addr_to_write_var : std_logic_vector(15 downto 0) := (others => '0');
     begin
         if(ss_n = '1' or reset_n = '0') then                         --this slave is not selected or being reset
             state <= s_idle;
@@ -93,33 +95,35 @@ BEGin
                             re_s <= '1';
                         end if;
                     elsif state = s_addr_h then
-                        addr_offset(15 DOWNTO 8) <= rx_buf_var;
+                        addr_offset(15 downto 8) <= rx_buf_var;
                         state <= s_addr_l;
                     elsif state = s_addr_l then
                         state <= s_data;
-                        addr_offset(7 DOWNTO 0) <= rx_buf_var;
+                        addr_offset(7 downto 0) <= rx_buf_var;
                         
                         addr_read <= std_logic_vector(unsigned(addr_offset)); -- first addr
-                        addr_write <= std_logic_vector(unsigned(addr_offset));
+                        addr_to_write_var := std_logic_vector(unsigned(addr_offset));
+                        addr_write <= addr_to_write_var;
                         bytes_counter := 1;
                     elsif state = s_data then
-                        addr_write <= addr_read;
-                        addr_read <= std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length)); -- increase the address
+                        addr_write <= addr_to_write_var;
+                        addr_to_write_var := std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length)); -- increase the address
                         bytes_counter := bytes_counter+1;
                         data_wr <= rx_buf_var;
                         if command=x"80" then
                             out_trigger <= '1';
                         end if;
-                    end if;
+                     end if;
                 elsif bit_count_var=2 then
                         if state = s_idle then
                             state <= s_cmd;
                         end if;
                         out_trigger <= '0';
+                elsif bit_count_var=1 then
+                    if command=x"40" then
+                        addr_read <= std_logic_vector(unsigned(addr_offset)+to_unsigned(bytes_counter,addr'length));
+                    end if;
                 end if;
-                
-
-                
             end if;
             
         end if;
@@ -127,17 +131,22 @@ BEGin
     end process;
     
     process(sclk,ss_n,reset_n)
+    variable temp_d : std_logic_vector(7 downto 0);
     begin
         if(ss_n = '1' or reset_n = '0') then                         --this slave is not selected or being reset
             miso <= '0';
         else
             if rising_edge(sclk) then
-                    if command=x"40" and state=s_data then  --write status register to master
-                    miso <= data_rd(7-bit_cnt_s);                  --send transmit register data to master
-                    else
-                    miso <= '0';
-                    end if;
-                end if;
+                    
+                     if command=x"40" and state=s_data then  --write status register to master\
+                        if bit_cnt_s =0 then
+                            temp_d := data_rd;
+                        end if;
+                        miso <= temp_d(7-bit_cnt_s);                  --send transmit register data to master
+                     else
+                        miso <= '0';
+                     end if;
+                 end if;       
         end if;
     end process;
     
@@ -151,13 +160,14 @@ BEGin
         
             if out_trigger='1' then
                 we_s <= '1';
-                timer_down := 4;
-            end if;
+                timer_down := 2;
+             end if;
             timer_down := timer_down-1;
             if timer_down=0 then
                 we_s <= '0';
             end if;
+           
         end if;
     end process;
 
-END rtl;
+end rtl;
