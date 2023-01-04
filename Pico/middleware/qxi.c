@@ -53,19 +53,24 @@ static inline void cs_deselect(uint cs_pin) {
 }
 
 void qxi_read_blocking(uint16_t addr, uint8_t *buf, size_t len) {
-    cs_select(QXI_SPI_CS_PIN);
+
+
     uint8_t cmdbuf[3] = {
             QXI_READ_COMMAND,
             addr >> 8,
             addr
     };
+
+    cs_select(QXI_SPI_CS_PIN);
     spi_write_blocking(QXI_SPI, cmdbuf, 3);
-    sleep_us(100);
+    sleep_us(1);
+
     spi_read_blocking(QXI_SPI, 0, buf, len);
     cs_deselect(QXI_SPI_CS_PIN);
 }
 
 void qxi_write_blocking(uint16_t addr, uint8_t data[], uint16_t len) {
+
     uint8_t cmdbuf[3] = {
             QXI_WRITE_COMMAND,
             addr >> 8,
@@ -73,7 +78,7 @@ void qxi_write_blocking(uint16_t addr, uint8_t data[], uint16_t len) {
     };
     cs_select(QXI_SPI_CS_PIN);
     spi_write_blocking(QXI_SPI, cmdbuf, 3);
-    sleep_us(100);
+    sleep_us(1);
     spi_write_blocking(QXI_SPI, data, len);
     cs_deselect(QXI_SPI_CS_PIN);
 }

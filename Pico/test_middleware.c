@@ -122,7 +122,7 @@ int main()
         else if (c =='w')
         {
             int err_cnt =0;
-            for (int k=0; k<100; k++)
+            for (int k=0; k<10; k++)
             {
                 for(int i=0;i<14;i++)
                     dat_sent[i] = rand()%256;
@@ -146,14 +146,14 @@ int main()
                     printf("\r\n");
                     err_cnt++;
                 }
-                else
-                {
-                    printf("Sent: ", k);
-                    printbuf(dat_sent, 14);
-                    printf("Recv: ");
-                    printbuf(dat_recv, 14);
-                    printf("\r\n");
-                }
+//                else
+//                {
+//                    printf("Sent: ", k);
+//                    printbuf(dat_sent, 14);
+//                    printf("Recv: ");
+//                    printbuf(dat_recv, 14);
+//                    printf("\r\n");
+//                }
             }
             printf("SPI interface text finished, %d times error happened.\r\n", err_cnt);
         }
