@@ -25,7 +25,7 @@ library xil_defaultlib;
 use xil_defaultlib.all;
 
 library fpgamiddlewarelibs;
-use fpgamiddlewarelibs.userlogicinterface.all;
+use fpgamiddlewarelibs.userlogicinterface.all; 
 
 
 entity env5_top_reconfig is
@@ -83,7 +83,7 @@ begin
                 end if;
             elsif addr_var = 2000 then
                 if userlogic_rd='1' then
-                    userlogic_data_out <= x"11";
+                    userlogic_data_out <= x"22";
                 end if;
             end if;
         end if;

@@ -83,8 +83,16 @@ int main()
         }
         else if(c=='3')
         {
+
             middleware_configure_fpag(0x0000);
             printf("reconfig 0x0000\r\n");
+
+
+        }
+        else if(c=='d')
+        {
+            uint8_t id = middleware_get_design_id();
+            printf("device id is 0x%02x\r\n", id);
         }
         else if(c=='4')
         {
