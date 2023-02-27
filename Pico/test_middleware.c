@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "middleware/middleware.h"
+#include <pico/bootrom.h>
 
 #define LED0_PIN 22
 #define LED1_PIN 24
@@ -34,7 +35,7 @@ void leds_all_on();
 void fpga_reset_init(void);
 void leds_all_off();
 void printbuf(uint8_t *buf, int16_t len);
-
+static void enterBootMode();
 
 uint8_t dat_sent[14];
 uint8_t dat_recv[14];
@@ -86,13 +87,6 @@ int main()
 
             middleware_configure_fpag(0x0000);
             printf("reconfig 0x0000\r\n");
-
-
-        }
-        else if(c=='d')
-        {
-            uint8_t id = middleware_get_design_id();
-            printf("device id is 0x%02x\r\n", id);
         }
         else if(c=='4')
         {
@@ -101,8 +95,27 @@ int main()
         }
         else if(c=='5')
         {
+            middleware_userlogic_enable();
             uint8_t id = middleware_get_design_id();
             printf("design id: %02x\r\n", id);
+            // middleware_userlogic_disable();
+        }        
+        else if(c=='6')
+        {
+            middleware_userlogic_enable();
+            uint8_t id = middleware_get_design_id();
+            printf("design id: %02x\r\n", id);
+            
+            sleep_ms(1000);
+            middleware_userlogic_disable();
+        }
+        
+        else if(c=='d')
+        {
+            middleware_userlogic_enable();
+            uint8_t id = middleware_get_design_id();
+            printf("design id: %02x\r\n", id);
+            // middleware_userlogic_disable();
         }
         else if (c == 'L')
         {
@@ -127,43 +140,9 @@ int main()
             fpga_reset(0);
 
         }
-        else if (c =='w')
+        else if(c=='b')
         {
-            int err_cnt =0;
-            for (int k=0; k<10; k++)
-            {
-                for(int i=0;i<14;i++)
-                    dat_sent[i] = rand()%256;
-                middleware_write_blocking(0x0000, dat_sent, 14);
-                middleware_read_blocking(0x0000, dat_recv, 14);
-                bool err_flag = false;
-                for(int i=0;i<14;i++)
-                {
-                    if (dat_sent[i]!=dat_recv[i])
-                    {
-                        err_flag = true;
-                        break;
-                    }
-                }
-                if(err_flag)
-                {
-                    printf("Error in sequence %d, read doesn't match the write: \r\n Sent: ", k);
-                    printbuf(dat_sent, 14);
-                    printf("Recv: ");
-                    printbuf(dat_recv, 14);
-                    printf("\r\n");
-                    err_cnt++;
-                }
-//                else
-//                {
-//                    printf("Sent: ", k);
-//                    printbuf(dat_sent, 14);
-//                    printf("Recv: ");
-//                    printbuf(dat_recv, 14);
-//                    printf("\r\n");
-//                }
-            }
-            printf("SPI interface text finished, %d times error happened.\r\n", err_cnt);
+            enterBootMode();
         }
 
         else if (c>20 && c<128){
@@ -264,4 +243,8 @@ void printbuf(uint8_t *buf, int16_t len) {
         printf("%02x ", buf[i]);
     }
     printf("\r\n");
+}
+
+static void enterBootMode() {
+    reset_usb_boot(0, 0);
 }

@@ -24,6 +24,22 @@ void middleware_configure_fpag(uint32_t address)
     qxi_write_blocking(ADDR_MULTI_BOOT, addr_arr, 3);
 }
 
+void middleware_userlogic_enable(void)
+{
+    uint8_t addr_arr[1];
+    addr_arr[0] = 0x00; // set user_logic_reset to 0 => enable
+
+    qxi_write_blocking(ADDR_USER_LOGIC_RESET, addr_arr, 3);
+}
+
+void middleware_userlogic_disable(void)
+{
+    uint8_t addr_arr[1];
+    addr_arr[0] = 0x01; // keep reseting the userlogic
+
+    qxi_write_blocking(ADDR_USER_LOGIC_RESET, addr_arr, 3);
+}
+
 void middleware_set_leds(uint8_t leds)
 {
     uint8_t write_data[1];
