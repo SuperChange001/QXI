@@ -39,6 +39,11 @@ static void enterBootMode();
 
 uint8_t dat_sent[14];
 uint8_t dat_recv[14];
+
+uint8_t dataset[24] = {0,0,0,0,0,16,0,16,0,0,16,16,16,0,0,16,0,16,16,16,0,16,16,16};
+// uint8_t dataset[24] = {0,16,16};
+uint8_t cmd[1] = {0x01};
+uint8_t read_data[3];
 int main()
 {
 
@@ -61,11 +66,84 @@ int main()
         char c = getchar_timeout_us(10000);
         if(c=='t')
         {
-            printf("hello\r\n");
+            
+            printf("Test\r\n");
+            
+           
+            fpga_reset(0);
+            sleep_ms(1);
+            printf("FPGA Reset on done\r\n");
+            middleware_userlogic_enable();
+            sleep_ms(1);
+            printf("Enable skeleton done\r\n");
+            uint8_t id = middleware_get_design_id();
+            printf("Design id: %02x\r\n", id);
+
+
+            for(int i=0;i<8;i++)
+            // int i=3;
+            {
+                middleware_userlogic_enable();
+
+                // middleware_write_blocking(0, dataset+i*3, 3);
+                // sleep_ms(1);
+                cmd[0] = 1;
+                middleware_write_blocking(100, cmd, 1);
+
+                sleep_ms(100);
+                
+                // middleware_read_blocking(0, read_data, 3);
+                middleware_read_blocking(1, read_data+1, 1);
+                middleware_read_blocking(1, read_data+1, 1);
+                middleware_read_blocking(1, read_data+1, 1);
+                middleware_read_blocking(1, read_data+1, 1);
+                printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
+                cmd[0] = 0;
+                middleware_write_blocking(100, cmd, 1);
+                sleep_ms(1);
+                middleware_userlogic_disable();
+                sleep_ms(1);
+            }
+
+            // fpga_powers_off();
+
+
+
         }
+        // else if(c=='8')
+        // {
+        //     middleware_userlogic_enable();
+        //     sleep_ms(1);
+        //     printf("Enable skeleton done\r\n");
+        //     uint8_t id = middleware_get_design_id();
+        //     printf("Design id: %02x\r\n", id);
+
+        //     middleware_read_blocking(0, testdata2, 14);
+        //     for(int i=0; i<14;i++)
+        //     {
+        //         printf("%03d, ", testdata2[i]);
+        //     }
+        //     printf("\r\n");
+        // }
+        // else if(c=='9')
+        // {
+        //     middleware_userlogic_enable();
+        //     sleep_ms(1);
+        //     printf("Enable skeleton done\r\n");
+        //     uint8_t id = middleware_get_design_id();
+        //     printf("Design id: %02x\r\n", id);
+
+        //     middleware_write_blocking(0, testdata, 14);
+        //     middleware_read_blocking(0, testdata2, 14);
+        //     for(int i=0; i<14;i++)
+        //     {
+        //         printf("%03d, ", testdata2[i]);
+        //     }
+        //     printf("\r\n");
+            
+        // }
         else if(c=='1')
         {
-
             middleware_set_leds(0xff);
             uint8_t read_data = middleware_get_leds();
             if (read_data==0x0f)
@@ -84,7 +162,6 @@ int main()
         }
         else if(c=='3')
         {
-
             middleware_configure_fpag(0x0000);
             printf("reconfig 0x0000\r\n");
         }
@@ -105,7 +182,7 @@ int main()
             middleware_userlogic_enable();
             uint8_t id = middleware_get_design_id();
             printf("design id: %02x\r\n", id);
-            
+
             sleep_ms(1000);
             middleware_userlogic_disable();
         }
@@ -115,7 +192,7 @@ int main()
             middleware_userlogic_enable();
             uint8_t id = middleware_get_design_id();
             printf("design id: %02x\r\n", id);
-            // middleware_userlogic_disable();
+            middleware_userlogic_disable();
         }
         else if (c == 'L')
         {
