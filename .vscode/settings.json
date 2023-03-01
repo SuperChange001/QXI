@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.rmd": "markdown",
+        "qxi.h": "c",
+        "stdbool.h": "c"
+    }
+}

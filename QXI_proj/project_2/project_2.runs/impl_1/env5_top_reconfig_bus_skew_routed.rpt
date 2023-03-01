@@ -1,0 +1,15 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2020.1 (lin64) Build 2902540 Wed May 27 19:54:35 MDT 2020
+| Date         : Thu Feb  2 15:07:23 2023
+| Host         : chao-ThinkPad-T490s running 64-bit Ubuntu 22.04.1 LTS
+| Command      : report_bus_skew -warn_on_violation -file env5_top_reconfig_bus_skew_routed.rpt -pb env5_top_reconfig_bus_skew_routed.pb -rpx env5_top_reconfig_bus_skew_routed.rpx
+| Design       : env5_top_reconfig
+| Device       : 7s15-ftgb196
+| Speed File   : -1  PRODUCTION 1.23 2018-06-13
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Bus Skew Report
+
+No bus skew constraints
+

@@ -80,23 +80,20 @@ int main()
             printf("Design id: %02x\r\n", id);
 
 
-            for(int i=0;i<8;i++)
+            for(int i=7;i<8;i++)
             // int i=3;
             {
                 middleware_userlogic_enable();
 
-                // middleware_write_blocking(0, dataset+i*3, 3);
+                middleware_write_blocking(0, dataset+i*3, 3);
                 // sleep_ms(1);
                 cmd[0] = 1;
                 middleware_write_blocking(100, cmd, 1);
 
                 sleep_ms(100);
                 
-                // middleware_read_blocking(0, read_data, 3);
-                middleware_read_blocking(1, read_data+1, 1);
-                middleware_read_blocking(1, read_data+1, 1);
-                middleware_read_blocking(1, read_data+1, 1);
-                middleware_read_blocking(1, read_data+1, 1);
+                middleware_read_blocking(0, read_data, 3);
+                // middleware_read_blocking(1, read_data+1, 1);
                 printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
                 cmd[0] = 0;
                 middleware_write_blocking(100, cmd, 1);
@@ -223,7 +220,7 @@ int main()
         }
 
         else if (c>20 && c<128){
-             printf("unknown char %c\r\n",c);
+            printf("unknown char %c\r\n",c);
         }
     }
 
