@@ -81,7 +81,7 @@ int main()
             printf("Design id: %02x\r\n", id);
 
 
-            for(int i=0;i<8;i++)
+            for(int i=7;i<8;i++)
             // int i=3;
             {
                 middleware_userlogic_enable();
@@ -233,7 +233,7 @@ int main()
         }
 
         else if (c>20 && c<128){
-             printf("unknown char %c\r\n",c);
+            printf("unknown char %c\r\n",c);
         }
     }
 

@@ -1,0 +1,322 @@
+
+*** Running vivado
+    with args -log env5_top_reconfig.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source env5_top_reconfig.tcl
+
+
+****** Vivado v2020.1 (64-bit)
+  **** SW Build 2902540 on Wed May 27 19:54:35 MDT 2020
+  **** IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+    ** Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+
+source env5_top_reconfig.tcl -notrace
+Command: synth_design -top env5_top_reconfig -part xc7s15ftgb196-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7s15'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7s15'
+INFO: [Device 21-403] Loading part xc7s15ftgb196-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 45434
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 2087.289 ; gain = 0.000 ; free physical = 7107 ; free virtual = 22423
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-2816] unknown character 's' in enumeration encoding is considered 'X' [/home/chao/git/QXI/source/icapInterface.vhd:40]
+WARNING: [Synth 8-1950] enum_encoding attribute specifies incorrect number of valid encoding values for type state_type ; encoding ignored [/home/chao/git/QXI/source/icapInterface.vhd:39]
+INFO: [Synth 8-638] synthesizing module 'env5_top_reconfig' [/home/chao/git/QXI/source/env5_reconfig_top.vhd:44]
+INFO: [Synth 8-638] synthesizing module 'spi_slave' [/home/chao/git/QXI/source/spi_slave.vhd:46]
+INFO: [Synth 8-256] done synthesizing module 'spi_slave' (1#1) [/home/chao/git/QXI/source/spi_slave.vhd:46]
+INFO: [Synth 8-638] synthesizing module 'middleware' [/home/chao/git/QXI/source/middleware.vhd:40]
+INFO: [Synth 8-638] synthesizing module 'InterfaceStateMachine' [/home/chao/git/QXI/source/InterfaceStateMachine.vhd:40]
+	Parameter control_region bound to: 16'b0000000011111111 
+INFO: [Synth 8-256] done synthesizing module 'InterfaceStateMachine' (2#1) [/home/chao/git/QXI/source/InterfaceStateMachine.vhd:40]
+INFO: [Synth 8-638] synthesizing module 'icapInterface' [/home/chao/git/QXI/source/icapInterface.vhd:37]
+	Parameter goldenboot_address bound to: 33'b000000000000000000000000000000000 
+	Parameter DEVICE_ID bound to: 32'b00100100000000000001000010010011 
+	Parameter ICAP_WIDTH bound to: X32 - type: string 
+	Parameter SIM_CFG_FILE_NAME bound to: NONE - type: string 
+INFO: [Synth 8-113] binding component instance 'ICAPE2_inst' to cell 'ICAPE2' [/home/chao/git/QXI/source/icapInterface.vhd:55]
+INFO: [Synth 8-256] done synthesizing module 'icapInterface' (3#1) [/home/chao/git/QXI/source/icapInterface.vhd:37]
+INFO: [Synth 8-256] done synthesizing module 'middleware' (4#1) [/home/chao/git/QXI/source/middleware.vhd:40]
+INFO: [Synth 8-256] done synthesizing module 'env5_top_reconfig' (5#1) [/home/chao/git/QXI/source/env5_reconfig_top.vhd:44]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 2087.289 ; gain = 0.000 ; free physical = 7138 ; free virtual = 22450
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:07 . Memory (MB): peak = 2087.289 ; gain = 0.000 ; free physical = 7110 ; free virtual = 22439
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:07 . Memory (MB): peak = 2087.289 ; gain = 0.000 ; free physical = 7110 ; free virtual = 22439
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2087.289 ; gain = 0.000 ; free physical = 7094 ; free virtual = 22421
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [/home/chao/git/QXI/constraints/env5.xdc]
+Finished Parsing XDC File [/home/chao/git/QXI/constraints/env5.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/home/chao/git/QXI/constraints/env5.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/env5_top_reconfig_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/env5_top_reconfig_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2149.344 ; gain = 0.000 ; free physical = 7003 ; free virtual = 22340
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2149.344 ; gain = 0.000 ; free physical = 7003 ; free virtual = 22340
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7159 ; free virtual = 22468
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7s15ftgb196-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7159 ; free virtual = 22468
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7159 ; free virtual = 22468
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'spi_slave'
+INFO: [Synth 8-802] inferred FSM for state register 'current_state_reg' in module 'icapInterface'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE3 |                            00001 |                              000
+*
+                  iSTATE |                            00010 |                              100
+                 iSTATE1 |                            00100 |                              001
+                 iSTATE2 |                            01000 |                              010
+                 iSTATE0 |                            10000 |                              011
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'one-hot' in module 'spi_slave'
+WARNING: [Synth 8-327] inferring latch for variable 'addr_reg' [/home/chao/git/QXI/source/spi_slave.vhd:66]
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE3 |                             0000 |                             0000
+                 iSTATE2 |                             0001 |                             0001
+                 iSTATE1 |                             0010 |                             0010
+                  iSTATE |                             0011 |                             0011
+                 iSTATE0 |                             0100 |                             0100
+                 iSTATE9 |                             0101 |                             0101
+                 iSTATE7 |                             0110 |                             0110
+                 iSTATE5 |                             0111 |                             0111
+                 iSTATE6 |                             1000 |                             1000
+                 iSTATE4 |                             1001 |                             1001
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'current_state_reg' using encoding 'sequential' in module 'icapInterface'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7141 ; free virtual = 22447
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   16 Bit       Adders := 2     
+	   2 Input   10 Bit       Adders := 1     
+	   2 Input    5 Bit       Adders := 1     
+	   2 Input    4 Bit       Adders := 3     
+	   2 Input    3 Bit       Adders := 1     
++---Registers : 
+	               32 Bit    Registers := 1     
+	               16 Bit    Registers := 4     
+	               10 Bit    Registers := 1     
+	                8 Bit    Registers := 6     
+	                4 Bit    Registers := 2     
+	                3 Bit    Registers := 1     
+	                1 Bit    Registers := 8     
++---RAMs : 
+	              112 Bit	(14 X 8 bit)          RAMs := 1     
++---Muxes : 
+	  10 Input   32 Bit        Muxes := 1     
+	   9 Input   24 Bit        Muxes := 1     
+	   2 Input   16 Bit        Muxes := 6     
+	   3 Input   16 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 4     
+	   3 Input    8 Bit        Muxes := 1     
+	   4 Input    5 Bit        Muxes := 1     
+	   2 Input    4 Bit        Muxes := 1     
+	  11 Input    4 Bit        Muxes := 1     
+	   2 Input    3 Bit        Muxes := 3     
+	   2 Input    1 Bit        Muxes := 22    
+	   4 Input    1 Bit        Muxes := 2     
+	   3 Input    1 Bit        Muxes := 4     
+	   5 Input    1 Bit        Muxes := 1     
+	   6 Input    1 Bit        Muxes := 3     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 20 (col length:20)
+BRAMs: 20 (col length: RAMB18 20 RAMB36 10)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7133 ; free virtual = 22433
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Distributed RAM: Preliminary Mapping	Report (see note below)
++------------------+--------------+-----------+----------------------+---------------+
+|Module Name       | RTL Object   | Inference | Size (Depth x Width) | Primitives    | 
++------------------+--------------+-----------+----------------------+---------------+
+|env5_top_reconfig | data_buf_reg | Implied   | 16 x 8               | RAM16X1S x 8	 | 
++------------------+--------------+-----------+----------------------+---------------+
+
+Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:18 ; elapsed = 00:00:23 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6981 ; free virtual = 22285
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:19 ; elapsed = 00:00:23 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6974 ; free virtual = 22278
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Distributed RAM: Final Mapping	Report
++------------------+--------------+-----------+----------------------+---------------+
+|Module Name       | RTL Object   | Inference | Size (Depth x Width) | Primitives    | 
++------------------+--------------+-----------+----------------------+---------------+
+|env5_top_reconfig | data_buf_reg | Implied   | 16 x 8               | RAM16X1S x 8	 | 
++------------------+--------------+-----------+----------------------+---------------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:19 ; elapsed = 00:00:24 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6969 ; free virtual = 22272
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6944 ; free virtual = 22248
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6944 ; free virtual = 22248
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6945 ; free virtual = 22249
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6945 ; free virtual = 22249
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6945 ; free virtual = 22249
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6945 ; free virtual = 22249
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |BUFG     |     2|
+|2     |CARRY4   |    10|
+|3     |ICAPE2   |     1|
+|4     |LUT1     |    10|
+|5     |LUT2     |    20|
+|6     |LUT3     |    60|
+|7     |LUT4     |    29|
+|8     |LUT5     |    69|
+|9     |LUT6     |    34|
+|10    |RAM16X1S |     8|
+|11    |FDCE     |    10|
+|12    |FDPE     |     1|
+|13    |FDRE     |   157|
+|14    |FDSE     |     3|
+|15    |LD       |    16|
+|16    |IBUF     |     4|
+|17    |OBUF     |     5|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 6945 ; free virtual = 22249
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:21 ; elapsed = 00:00:25 . Memory (MB): peak = 2149.344 ; gain = 0.000 ; free physical = 7008 ; free virtual = 22312
+Synthesis Optimization Complete : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7008 ; free virtual = 22312
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2149.344 ; gain = 0.000 ; free physical = 7083 ; free virtual = 22387
+INFO: [Netlist 29-17] Analyzing 34 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2149.344 ; gain = 0.000 ; free physical = 7024 ; free virtual = 22328
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 24 instances were transformed.
+  LD => LDCE: 16 instances
+  RAM16X1S => RAM32X1S (RAMS32): 8 instances
+
+INFO: [Common 17-83] Releasing license: Synthesis
+30 Infos, 3 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:32 ; elapsed = 00:00:34 . Memory (MB): peak = 2149.344 ; gain = 62.055 ; free physical = 7160 ; free virtual = 22464
+INFO: [Common 17-1381] The checkpoint '/home/chao/git/QXI/QXI_proj/project_2/project_2.runs/synth_1/env5_top_reconfig.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file env5_top_reconfig_utilization_synth.rpt -pb env5_top_reconfig_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Thu Feb  2 15:06:29 2023...
