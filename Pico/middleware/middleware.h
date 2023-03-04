@@ -13,7 +13,7 @@
 #define ADDR_USER_LOGIC_OFFSET 0x0100
 #define ADDR_DESIGN_ID (ADDR_USER_LOGIC_OFFSET+2000)
 
-
+#define FPGA_BUSY_PIN 15
 void middleware_init();
 void middleware_deinit();
 void middleware_configure_fpag(uint32_t address);
@@ -24,4 +24,5 @@ void middleware_write_blocking(uint32_t address, uint8_t* data, uint16_t len);
 uint8_t middleware_read_blocking(uint32_t address, uint8_t* data, uint16_t len);
 void middleware_userlogic_enable(void);
 void middleware_userlogic_disable(void);
+bool middleware_get_busy_status(void);
 #endif //MY_PROJECT_MIDDLEWARE_H

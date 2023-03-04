@@ -35,7 +35,7 @@ if (TARGET tinyusb_device)
 
     ###########################################################
     # creates test_middleware executable
-    add_executable(test_middleware test_middleware.c)
+    add_executable(test_middleware test_middleware.c data_set.c)
     target_include_directories(test_middleware PUBLIC .)
     # Pull in our pico_stdlib which aggregates commonly used features
     target_link_libraries(test_middleware pico_stdlib hardware_spi middleware)

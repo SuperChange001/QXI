@@ -3,5 +3,6 @@
         "*.rmd": "markdown",
         "qxi.h": "c",
         "stdbool.h": "c"
-    }
+    },
+    "cmake.sourceDirectory": "${workspaceFolder}/Pico"
 }

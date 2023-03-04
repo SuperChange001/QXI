@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include "middleware/middleware.h"
 #include <pico/bootrom.h>
-
+#include "data_set.h"
 #define LED0_PIN 22
 #define LED1_PIN 24
 #define LED2_PIN 25
@@ -40,11 +40,70 @@ static void enterBootMode();
 uint8_t dat_sent[14];
 uint8_t dat_recv[14];
 
-uint8_t dataset[24] = {0,0,0,0,0,16,0,16,0,0,16,16,16,0,0,16,0,16,16,16,0,16,16,16};
+uint8_t dataset_logic[24] = {0,0,0,0,0,16,0,16,0,0,16,16,16,0,0,16,0,16,16,16,0,16,16,16};
 // uint8_t dataset[24] = {0,16,16};
 uint8_t cmd[1] = {0x01};
 uint8_t read_data[3];
-uint8_t reults[8];
+int8_t reults[8];
+
+uint8_t results[2010];
+void test_model_traffic()
+{
+    printf("Test\r\n");
+
+    // printf("Inference result: %02x, %02x, %02x\r\n", dataset_traffic[0], dataset_traffic[1], dataset_traffic[2]);
+
+        // fpga_reset(0);
+        // sleep_ms(1);
+        // printf("FPGA Reset on done\r\n");
+        // middleware_userlogic_enable();
+        // sleep_ms(1);
+        // printf("Enable skeleton done\r\n");
+        // uint8_t id = middleware_get_design_id();
+        // printf("Design id: %02x\r\n", id);
+
+    double sum_error = 0;
+    uint8_t result = 0;
+    for(int i=0;i<2010;i++)
+    {
+        middleware_userlogic_enable();
+
+        middleware_write_blocking(0, (uint8_t* )(dataset_traffic+i), 6);
+
+        cmd[0] = 1;
+        middleware_write_blocking(100, cmd, 1);
+
+        while(middleware_get_busy_status());
+        
+        middleware_read_blocking(1, (uint8_t* )(results+i), 1);
+
+        cmd[0] = 0;
+        middleware_write_blocking(100, cmd, 1);
+
+        middleware_userlogic_disable();
+
+
+    }
+    for(int i=0; i<2010;i++)
+    {
+        double error = dataset_traffic[i+6]*0.0625-(int8_t)results[i]*0.0625;
+        sum_error = sum_error+error*error;
+        printf("%03d, %03d, ", 500+dataset_traffic[i+6], 500+(int8_t)results[i]);
+        if(i%20==0)
+        {
+            printf("\r\n");
+            sleep_ms(10);   
+        }
+            
+        
+    }
+    double mse = sum_error/2010;
+
+    printf("\r\nMSE is: %f\r\n", mse);
+    
+}
+
+
 int main()
 {
 
@@ -68,90 +127,11 @@ int main()
         if(c=='t')
         {
             
-            printf("Test\r\n");
-            
-           
-            fpga_reset(0);
-            sleep_ms(1);
-            printf("FPGA Reset on done\r\n");
-            middleware_userlogic_enable();
-            sleep_ms(1);
-            printf("Enable skeleton done\r\n");
-            uint8_t id = middleware_get_design_id();
-            printf("Design id: %02x\r\n", id);
 
 
-            for(int i=7;i<8;i++)
-            // int i=3;
-            {
-                middleware_userlogic_enable();
-
-                middleware_write_blocking(0, dataset+i*3, 3);
-                // sleep_ms(1);
-                cmd[0] = 1;
-                middleware_write_blocking(100, cmd, 1);
-
-                sleep_ms(100);
-                
-                middleware_read_blocking(1, reults+i, 1);
-                // printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
-                cmd[0] = 0;
-                middleware_write_blocking(100, cmd, 1);
-                sleep_ms(1);
-                middleware_userlogic_disable();
-                sleep_ms(1);
-            }
-
-            for(int i=0; i<8; i++)
-            {
-                printf("Sample %d ( 0x%02x, 0x%02x, 0x%02x): ", i, dataset[i*3+0], dataset[i*3+1], dataset[i*3+2]);
-                // printf("%d \r\n",  reults[i]);
-                if (((int8_t) reults[i])<=0)
-                {
-                    printf("0 \r\n");
-                }
-                else
-                {
-                    printf("1 \r\n");
-                }
-            }
-            // fpga_powers_off();
-
-
+            test_model_traffic();
 
         }
-        // else if(c=='8')
-        // {
-        //     middleware_userlogic_enable();
-        //     sleep_ms(1);
-        //     printf("Enable skeleton done\r\n");
-        //     uint8_t id = middleware_get_design_id();
-        //     printf("Design id: %02x\r\n", id);
-
-        //     middleware_read_blocking(0, testdata2, 14);
-        //     for(int i=0; i<14;i++)
-        //     {
-        //         printf("%03d, ", testdata2[i]);
-        //     }
-        //     printf("\r\n");
-        // }
-        // else if(c=='9')
-        // {
-        //     middleware_userlogic_enable();
-        //     sleep_ms(1);
-        //     printf("Enable skeleton done\r\n");
-        //     uint8_t id = middleware_get_design_id();
-        //     printf("Design id: %02x\r\n", id);
-
-        //     middleware_write_blocking(0, testdata, 14);
-        //     middleware_read_blocking(0, testdata2, 14);
-        //     for(int i=0; i<14;i++)
-        //     {
-        //         printf("%03d, ", testdata2[i]);
-        //     }
-        //     printf("\r\n");
-            
-        // }
         else if(c=='1')
         {
             middleware_set_leds(0xff);
@@ -334,4 +314,56 @@ void printbuf(uint8_t *buf, int16_t len) {
 
 static void enterBootMode() {
     reset_usb_boot(0, 0);
+}
+
+void tese_model_logic_func()
+{
+    printf("Test\r\n");
+
+
+    fpga_reset(0);
+    sleep_ms(1);
+    printf("FPGA Reset on done\r\n");
+    middleware_userlogic_enable();
+    sleep_ms(1);
+    printf("Enable skeleton done\r\n");
+    uint8_t id = middleware_get_design_id();
+    printf("Design id: %02x\r\n", id);
+
+
+    for(int i=7;i<8;i++)
+    // int i=3;
+    {
+        middleware_userlogic_enable();
+
+        middleware_write_blocking(0, dataset_logic+i*3, 3);
+        // sleep_ms(1);
+        cmd[0] = 1;
+        middleware_write_blocking(100, cmd, 1);
+
+        sleep_ms(100);
+        
+        middleware_read_blocking(1, reults+i, 1);
+        // printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
+        cmd[0] = 0;
+        middleware_write_blocking(100, cmd, 1);
+        sleep_ms(1);
+        middleware_userlogic_disable();
+        sleep_ms(1);
+    }
+
+    for(int i=0; i<8; i++)
+    {
+        printf("Sample %d ( 0x%02x, 0x%02x, 0x%02x): ", i, dataset_logic[i*3+0], dataset_logic[i*3+1], dataset_logic[i*3+2]);
+        // printf("%d \r\n",  reults[i]);
+        if (((int8_t) reults[i])<=0)
+        {
+            printf("0 \r\n");
+        }
+        else
+        {
+            printf("1 \r\n");
+        }
+    }
+    // fpga_powers_off();
 }
