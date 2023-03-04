@@ -44,6 +44,7 @@ uint8_t dataset[24] = {0,0,0,0,0,16,0,16,0,0,16,16,16,0,0,16,0,16,16,16,0,16,16,
 // uint8_t dataset[24] = {0,16,16};
 uint8_t cmd[1] = {0x01};
 uint8_t read_data[3];
+uint8_t reults[8];
 int main()
 {
 
@@ -85,19 +86,15 @@ int main()
             {
                 middleware_userlogic_enable();
 
-                // middleware_write_blocking(0, dataset+i*3, 3);
+                middleware_write_blocking(0, dataset+i*3, 3);
                 // sleep_ms(1);
                 cmd[0] = 1;
                 middleware_write_blocking(100, cmd, 1);
 
                 sleep_ms(100);
                 
-                // middleware_read_blocking(0, read_data, 3);
-                middleware_read_blocking(1, read_data+1, 1);
-                middleware_read_blocking(1, read_data+1, 1);
-                middleware_read_blocking(1, read_data+1, 1);
-                middleware_read_blocking(1, read_data+1, 1);
-                printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
+                middleware_read_blocking(1, reults+i, 1);
+                // printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
                 cmd[0] = 0;
                 middleware_write_blocking(100, cmd, 1);
                 sleep_ms(1);
@@ -105,6 +102,19 @@ int main()
                 sleep_ms(1);
             }
 
+            for(int i=0; i<8; i++)
+            {
+                printf("Sample %d ( 0x%02x, 0x%02x, 0x%02x): ", i, dataset[i*3+0], dataset[i*3+1], dataset[i*3+2]);
+                // printf("%d \r\n",  reults[i]);
+                if (((int8_t) reults[i])<=0)
+                {
+                    printf("0 \r\n");
+                }
+                else
+                {
+                    printf("1 \r\n");
+                }
+            }
             // fpga_powers_off();
 
 

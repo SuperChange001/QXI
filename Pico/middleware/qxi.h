@@ -23,7 +23,7 @@
 #define QXI_SPI_CS_PIN 17
 
 // #define QXI_BAUD_RATE 62000*1000 // @62MHz
-#define QXI_BAUD_RATE 10000*1000 // @10MHz
+#define QXI_BAUD_RATE 6000*1000 // @10MHz
 
 // Notice: the format is depends on the design on FPGA
 #define QXI_CPOL SPI_CPOL_0
