@@ -4,6 +4,7 @@
 
 #include "middleware.h"
 #include "pico/stdlib.h"
+#include "hardware/gpio.h"
 static void middleware_userlogic_busy_status_init(void);
 
 
@@ -89,7 +90,7 @@ static void middleware_userlogic_busy_status_init(void)
 
 static void middleware_userlogic_busy_status_deinit(void)
 {
-    gpio_deinit(FPGA_BUSY_PIN);
+    gpio_set_function(FPGA_BUSY_PIN, GPIO_FUNC_NULL);
 }
 
 

@@ -10,4 +10,4 @@ target_sources(middleware INTERFACE
 target_include_directories(middleware INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 # Pull in pico libraries that we need
-target_link_libraries(middleware INTERFACE pico_stdlib hardware_spi)
+target_link_libraries(middleware INTERFACE pico_stdlib hardware_spi hardware_gpio)

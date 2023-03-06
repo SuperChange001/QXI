@@ -206,17 +206,34 @@ data2=[515, 510,
 512, 507, 510, 508, 511, 507, 511, 507, 511, 507, 512, 507, 509, 508, 511, 506, 511, 508, 511, 507, 511, 507, 510,
 512, 508, 513, 509, 512, 508, 511, 508, 511, 507, 511, 507, 513, 507, 514, 508, 514, 508]
 
-mean = 65.46790675
-scale = 3.63739352
+# mean = 65.46790675
+# scale = 3.63739352
 
-data_lable=[]
-data_pred=[]
-for i in range(0, len(data2)//2):
-	data_lable.append((data2[2*i]-500)/16.0*scale+mean)
-	data_pred.append((data2[2*i+1]-500)/16.0*scale+mean)
+# data_lable=[]
+# data_pred=[]
+# for i in range(0, len(data2)//2):
+# 	data_lable.append((data2[2*i]-500)/16.0*scale+mean)
+# 	data_pred.append((data2[2*i+1]-500)/16.0*scale+mean)
 	
-fig = plt.figure()
-plt.plot(range(len(data_lable)), data_lable)
-plt.plot(range(len(data_lable)), data_pred)
-# plt.show()
-fig.savefig("MSE-0_17.png")
+# fig = plt.figure()
+# plt.plot(range(len(data_lable)), data_lable)
+# plt.plot(range(len(data_lable)), data_pred)
+# # plt.show()
+# fig.savefig("MSE-0_17.png")
+
+sum_err = 0
+for i in range(0, len(data)//2):
+    data_lable = (data[2*i]-500)/16.0
+    data_pred = (data[2*i+1]-500)/16.0
+    err_2 = (data_lable-data_pred)*(data_lable-data_pred)
+    sum_err += err_2
+print("MSE:%f", sum_err/(len(data)//2))
+
+sum_err = 0
+data=data2
+for i in range(0, len(data)//2):
+    data_lable = (data[2*i]-500)/16.0
+    data_pred = (data[2*i+1]-500)/16.0
+    err_2 = (data_lable-data_pred)*(data_lable-data_pred)
+    sum_err += err_2
+print("MSE:%f", sum_err/(len(data)//2))

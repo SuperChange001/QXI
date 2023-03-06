@@ -1,4 +1,5 @@
 #include "stub_skeleton.h"
+#include <stdio.h>
 
 uint8_t skeleton_get_id()
 {
@@ -10,9 +11,9 @@ uint8_t skeleton_get_id()
     return id;
 }
 
-bool skeleton_switch(uint8_t id)
+void skeleton_switch(uint8_t id)
 {
-    bool res = true;
+
     if(id==0x05)
     {
         middleware_configure_fpga(0x0000);
@@ -28,12 +29,15 @@ bool skeleton_switch(uint8_t id)
     }
 
     sleep_ms(200);
+
     if(skeleton_get_id()!=id)
     {
-        res = false;
+        printf("d, switched to model 1\r\n");
     }
-    return res;
-
+    else
+    {
+        printf("d, switching model faild\r\n");
+    }
 }
 
 void skeleton_enable()

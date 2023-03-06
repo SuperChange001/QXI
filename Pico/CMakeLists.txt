@@ -22,6 +22,7 @@ if (TARGET tinyusb_device)
     add_subdirectory(pac193x)
     add_subdirectory(gpio)
     add_subdirectory(i2c)
+    add_subdirectory(board)
 
     ###########################################################
     # creates test_middleware executable
@@ -33,7 +34,8 @@ if (TARGET tinyusb_device)
             hardware_i2c 
             hardware_spi 
             middleware 
-            sensor_lib_pac193x)
+            sensor_lib_pac193x
+            board_lib)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(test_middleware 1)
