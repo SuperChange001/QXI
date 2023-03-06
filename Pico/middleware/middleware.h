@@ -16,13 +16,15 @@
 #define FPGA_BUSY_PIN 15
 void middleware_init();
 void middleware_deinit();
-void middleware_configure_fpag(uint32_t address);
+void middleware_configure_fpga(uint32_t address);
 void middleware_set_leds(uint8_t leds);
 uint8_t middleware_get_leds(void);
-uint8_t middleware_get_design_id(void);
-void middleware_write_blocking(uint32_t address, uint8_t* data, uint16_t len);
-uint8_t middleware_read_blocking(uint32_t address, uint8_t* data, uint16_t len);
+
+uint8_t middleware_userlogic_get_design_id(void);
+void middleware_userlogic_write_blocking(uint32_t address, uint8_t* data, uint16_t len);
+uint8_t middleware_userlogic_read_blocking(uint32_t address, uint8_t* data, uint16_t len);
 void middleware_userlogic_enable(void);
 void middleware_userlogic_disable(void);
-bool middleware_get_busy_status(void);
+bool middleware_userlogic_get_busy_status(void);
+
 #endif //MY_PROJECT_MIDDLEWARE_H

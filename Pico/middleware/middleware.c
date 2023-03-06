@@ -4,13 +4,13 @@
 
 #include "middleware.h"
 #include "pico/stdlib.h"
-static void middleware_busy_status_init(void);
+static void middleware_userlogic_busy_status_init(void);
 
 
 void middleware_init()
 {
     qxi_init();
-    middleware_busy_status_init();
+    middleware_userlogic_busy_status_init();
 }
 
 void middleware_deinit()
@@ -18,7 +18,7 @@ void middleware_deinit()
     qxi_deinit();
 }
 
-void middleware_configure_fpag(uint32_t address)
+void middleware_configure_fpga(uint32_t address)
 {
     uint8_t addr_arr[3];
     addr_arr[2] = (uint8_t)((0x00ff0000&address)>>16);
@@ -61,7 +61,7 @@ uint8_t middleware_get_leds(void)
     return (0x0f&read_data[0]);
 }
 
-uint8_t middleware_get_design_id(void)
+uint8_t middleware_userlogic_get_design_id(void)
 {
     uint8_t read_data[1];
 
@@ -70,30 +70,30 @@ uint8_t middleware_get_design_id(void)
     return read_data[0];
 }
 
-void middleware_write_blocking(uint32_t address, uint8_t* data, uint16_t len)
+void middleware_userlogic_write_blocking(uint32_t address, uint8_t* data, uint16_t len)
 {
     qxi_write_blocking(ADDR_USER_LOGIC_OFFSET+address, data, len);
 }
 
-uint8_t middleware_read_blocking(uint32_t address, uint8_t* data, uint16_t len)
+uint8_t middleware_userlogic_read_blocking(uint32_t address, uint8_t* data, uint16_t len)
 {
     qxi_read_blocking(ADDR_USER_LOGIC_OFFSET+address, data, len);
 }
 
-static void middleware_busy_status_init(void)
+static void middleware_userlogic_busy_status_init(void)
 {
     gpio_init(FPGA_BUSY_PIN);
 
     gpio_set_dir(FPGA_BUSY_PIN, GPIO_IN);
 }
 
-static void middleware_busy_status_deinit(void)
+static void middleware_userlogic_busy_status_deinit(void)
 {
     gpio_deinit(FPGA_BUSY_PIN);
 }
 
 
-bool middleware_get_busy_status(void)
+bool middleware_userlogic_get_busy_status(void)
 {
     return gpio_get(FPGA_BUSY_PIN);
 }

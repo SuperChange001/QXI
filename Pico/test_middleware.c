@@ -6,7 +6,13 @@
 #include <stdbool.h>
 #include "middleware/middleware.h"
 #include <pico/bootrom.h>
-#include "data_set.h"
+#include "Common.h"
+#include "pac193x/Pac193x.h"
+#include "pac193x/Pac193xTypedefs.h"
+#include <hardware/i2c.h>
+#include <time.h>
+#include "stub_skeleton.h"
+
 #define LED0_PIN 22
 #define LED1_PIN 24
 #define LED2_PIN 25
@@ -46,66 +52,78 @@ uint8_t cmd[1] = {0x01};
 uint8_t read_data[3];
 int8_t reults[8];
 
-uint8_t results[2010];
-void test_model_traffic()
+int8_t predict_on_fpga(int8_t* inputs)
 {
-    printf("Test\r\n");
+    int8_t result;
 
-    // printf("Inference result: %02x, %02x, %02x\r\n", dataset_traffic[0], dataset_traffic[1], dataset_traffic[2]);
+    skeleton_enable();
 
-        // fpga_reset(0);
-        // sleep_ms(1);
-        // printf("FPGA Reset on done\r\n");
-        // middleware_userlogic_enable();
-        // sleep_ms(1);
-        // printf("Enable skeleton done\r\n");
-        // uint8_t id = middleware_get_design_id();
-        // printf("Design id: %02x\r\n", id);
+    skeleton_write_inputs(inputs);
+    skeleton_model_compute(true);
+    while(skeleton_busy());
+    result = skeleton_read_result();
 
-    double sum_error = 0;
-    uint8_t result = 0;
-    for(int i=0;i<2010;i++)
-    {
-        middleware_userlogic_enable();
+    skeleton_model_compute(false);
 
-        middleware_write_blocking(0, (uint8_t* )(dataset_traffic+i), 6);
-
-        cmd[0] = 1;
-        middleware_write_blocking(100, cmd, 1);
-
-        while(middleware_get_busy_status());
-        
-        middleware_read_blocking(1, (uint8_t* )(results+i), 1);
-
-        cmd[0] = 0;
-        middleware_write_blocking(100, cmd, 1);
-
-        middleware_userlogic_disable();
-
-
-    }
-    for(int i=0; i<2010;i++)
-    {
-        double error = dataset_traffic[i+6]*0.0625-(int8_t)results[i]*0.0625;
-        sum_error = sum_error+error*error;
-        printf("%03d, %03d, ", 500+dataset_traffic[i+6], 500+(int8_t)results[i]);
-        if(i%20==0)
-        {
-            printf("\r\n");
-            sleep_ms(10);   
-        }
-            
-        
-    }
-    double mse = sum_error/2010;
-
-    printf("\r\nMSE is: %f\r\n", mse);
-    
+    skeleton_disable();
+    return result;
 }
 
 
-int main()
+uint8_t recv_buf[18];
+int8_t inputs[6];
+void mem_copy(uint8_t* recv_buf)
 {
+    for(int i=0; i<18;i++)
+    {
+        recv_buf[i] = recv_buf[i+1];
+    }
+}
+
+void decode_sensor_data(uint8_t* recv_buf, int8_t* inputs)
+{
+    for(int i=0; i<6;i++)
+    {
+        inputs[i] = ((recv_buf[i*3]-0x30)*100 + (recv_buf[i*3+1]-0x30)*10 + (recv_buf[i*3+2]-0x30))-500;
+    }
+}
+
+/* region SENSOR DEFINITIONS */
+
+static pac193xSensorConfiguration_t sensor1 = {
+    .i2c_host = i2c1,
+    .i2c_slave_address = PAC193X_I2C_ADDRESS_499R,
+    .powerPin = -1,
+    .usedChannels = {.uint_channelsInUse = 0b00001111},
+    .rSense = {0.82f, 0.82f, 0.82f, 0.82f},
+};
+#define PAC193X_CHANNEL_SENSORS PAC193X_CHANNEL01
+#define PAC193X_CHANNEL_RAW PAC193X_CHANNEL02
+#define PAC193X_CHANNEL_MCU PAC193X_CHANNEL03
+#define PAC193X_CHANNEL_WIFI PAC193X_CHANNEL04
+// VCC_SENSORS, VCC_USB, VCC_MCU, VCC_WIFI, VCC_FPGA_IO, VCC_FPGA_AUX, VCC_FPGA_INT, VCC_FPGA_SRAM
+static pac193xSensorConfiguration_t sensor2 = {
+    .i2c_host = i2c1,
+    .i2c_slave_address = PAC193X_I2C_ADDRESS_806R,
+    .powerPin = -1,
+    .usedChannels = {.uint_channelsInUse = 0b00001111},
+    .rSense = {0.82f, 0.82f, 0.82f, 0.82f},
+};
+#define PAC193X_CHANNEL_FPGA_IO PAC193X_CHANNEL01
+#define PAC193X_CHANNEL_FPGA_1V8 PAC193X_CHANNEL02
+#define PAC193X_CHANNEL_FPGA_1V PAC193X_CHANNEL03
+#define PAC193X_CHANNEL_FPGA_SRAM PAC193X_CHANNEL04
+
+/* endregion SENSOR DEFINITIONS */
+
+
+pac193xPowerMeasurements_t sensor1_measurements;
+pac193xPowerMeasurements_t sensor2_measurements;
+int8_t prediction;
+absolute_time_t last_absolute_time=0;
+int main()
+{   
+    uint8_t counter=0;
 
     fpga_flash_spi_deinit();
     fpga_reset_init();
@@ -114,107 +132,103 @@ int main()
     fpga_reset(0);
     sleep_ms(100);
     fpga_powers_on();
+    sleep_ms(1000);
+//    fpga_powers_off();
+    fpga_reset(1);
     sleep_ms(100);
-    fpga_powers_off();
+    fpga_reset(0);
 
     // enable QXI interface to the FPGA
     middleware_init();
 
     stdio_init_all();
+
+    pac193xErrorCode_t errorCode;
+    
+    errorCode = pac193xInit(sensor1);
+    errorCode = pac193xInit(sensor2);
+    errorCode = pac193xStartAccumulation(sensor1);
+    errorCode = pac193xStartAccumulation(sensor2);
     while(1)
     {
+        absolute_time_t t_now = get_absolute_time(); 
+        if(absolute_time_diff_us(last_absolute_time, t_now)>20000)
+        {
+            errorCode = pac193xReadAccumulatedPowerForAllChannels(sensor1, &sensor1_measurements);
+            errorCode = pac193xReadAccumulatedPowerForAllChannels(sensor2, &sensor2_measurements);
+            last_absolute_time = t_now;
+        }
+
+
         char c = getchar_timeout_us(10000);
-        if(c=='t')
-        {
-            
 
+        if(c>=10 && c<128)
+        {
+            // printf("%c", c);
+            if(c>='0' && c<='9')
+            {
+                mem_copy(recv_buf);
+                recv_buf[17] = c;
+            }
+            else if (c=='t')
+            {
+                for(int i=0;i<6;i++)
+                    printf("%d,", inputs[i]);
+                printf("\r\n===========\r\n");
+            //     if(skeleton_switch(0x05))
+            //     {
+            //         printf("d, switched to model 1\r\n");
+            //     }
+            //     else
+            //     {
+            //         printf("d, switching model faild\r\n");
+            //     }
+            // }
+            // else if (c=='T') // change the command
+            // {
+            //     if(skeleton_switch(0x16))
+            //     {
+            //         printf("d, switched to model 2\r\n");
+            //     }
+            //     else
+            //     {
+            //         printf("d, switching model faild\r\n");
+            //     }
+            }
+            else if (c=='p')
+            {
+                printf("p,%4.6f,%4.6f,%4.6f,%4.6f,%4.6f,%4.6f,%4.6f,%4.6f,\r\n",
+                sensor1_measurements.powerChannel1/sensor1_measurements.counterOfMeasurements,
+                sensor1_measurements.powerChannel2/sensor1_measurements.counterOfMeasurements,
+                sensor1_measurements.powerChannel3/sensor1_measurements.counterOfMeasurements,
+                sensor1_measurements.powerChannel4/sensor1_measurements.counterOfMeasurements,
+                sensor2_measurements.powerChannel1/sensor1_measurements.counterOfMeasurements,
+                sensor2_measurements.powerChannel2/sensor1_measurements.counterOfMeasurements,
+                sensor2_measurements.powerChannel3/sensor1_measurements.counterOfMeasurements,
+                sensor2_measurements.powerChannel4/sensor1_measurements.counterOfMeasurements
+                );
+            }
+            else if (c==0x0d)
+            {
+                decode_sensor_data(recv_buf, inputs);
+                prediction = predict_on_fpga(inputs);
+                          
+                printf("x,%03d,\r\n", prediction+500);
 
-            test_model_traffic();
-
-        }
-        else if(c=='1')
-        {
-            middleware_set_leds(0xff);
-            uint8_t read_data = middleware_get_leds();
-            if (read_data==0x0f)
-                printf("leds all on\r\n");
-            else
-                printf("set leds all on failed.\r\n");
-        }
-        else if(c=='2')
-        {
-            middleware_set_leds(0xf0);
-            uint8_t read_data = middleware_get_leds();
-            if (read_data==0x00)
-                printf("leds all off\r\n");
-            else
-                printf("set leds all off failed.\r\n");
-        }
-        else if(c=='3')
-        {
-            middleware_configure_fpag(0x0000);
-            printf("reconfig 0x0000\r\n");
-        }
-        else if(c=='4')
-        {
-            middleware_configure_fpag(0x00100000);
-            printf("reconfig to 0x00100000\r\n");
-        }
-        else if(c=='5')
-        {
-            middleware_userlogic_enable();
-            uint8_t id = middleware_get_design_id();
-            printf("design id: %02x\r\n", id);
-            // middleware_userlogic_disable();
-        }        
-        else if(c=='6')
-        {
-            middleware_userlogic_enable();
-            uint8_t id = middleware_get_design_id();
-            printf("design id: %02x\r\n", id);
-
-            sleep_ms(1000);
-            middleware_userlogic_disable();
-        }
-        
-        else if(c=='d')
-        {
-            middleware_userlogic_enable();
-            uint8_t id = middleware_get_design_id();
-            printf("design id: %02x\r\n", id);
-            middleware_userlogic_disable();
-        }
-        else if (c == 'L')
-        {
-            leds_all_on();
-        }
-        else if (c == 'l')
-        {
-            leds_all_off();
-        }
-        else if (c == 'F')
-        {
-            fpga_powers_on();
-        }
-        else if (c == 'f')
-        {
-            fpga_powers_off();
-        }
-        else if (c=='r')
-        {
-            fpga_reset(1);
-            sleep_ms(100);
-            fpga_reset(0);
+                counter++;
+                if(counter%2)
+                {
+                    leds_all_on();
+                }
+                else
+                {
+                    leds_all_off();
+                }
+                
+            }
 
         }
-        else if(c=='b')
-        {
-            enterBootMode();
-        }
 
-        else if (c>20 && c<128){
-            printf("unknown char %c\r\n",c);
-        }
     }
 
 }
@@ -314,56 +328,4 @@ void printbuf(uint8_t *buf, int16_t len) {
 
 static void enterBootMode() {
     reset_usb_boot(0, 0);
-}
-
-void tese_model_logic_func()
-{
-    printf("Test\r\n");
-
-
-    fpga_reset(0);
-    sleep_ms(1);
-    printf("FPGA Reset on done\r\n");
-    middleware_userlogic_enable();
-    sleep_ms(1);
-    printf("Enable skeleton done\r\n");
-    uint8_t id = middleware_get_design_id();
-    printf("Design id: %02x\r\n", id);
-
-
-    for(int i=7;i<8;i++)
-    // int i=3;
-    {
-        middleware_userlogic_enable();
-
-        middleware_write_blocking(0, dataset_logic+i*3, 3);
-        // sleep_ms(1);
-        cmd[0] = 1;
-        middleware_write_blocking(100, cmd, 1);
-
-        sleep_ms(100);
-        
-        middleware_read_blocking(1, reults+i, 1);
-        // printf("Inference result: %02x, %02x, %02x\r\n", read_data[0], read_data[1], read_data[2]);
-        cmd[0] = 0;
-        middleware_write_blocking(100, cmd, 1);
-        sleep_ms(1);
-        middleware_userlogic_disable();
-        sleep_ms(1);
-    }
-
-    for(int i=0; i<8; i++)
-    {
-        printf("Sample %d ( 0x%02x, 0x%02x, 0x%02x): ", i, dataset_logic[i*3+0], dataset_logic[i*3+1], dataset_logic[i*3+2]);
-        // printf("%d \r\n",  reults[i]);
-        if (((int8_t) reults[i])<=0)
-        {
-            printf("0 \r\n");
-        }
-        else
-        {
-            printf("1 \r\n");
-        }
-    }
-    // fpga_powers_off();
 }

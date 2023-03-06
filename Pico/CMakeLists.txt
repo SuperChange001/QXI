@@ -19,26 +19,21 @@ pico_sdk_init()
 if (TARGET tinyusb_device)
 
     add_subdirectory(middleware)
-
-    # creates test_qxi executable
-    add_executable(test_qxi test_qxi.c)
-    target_include_directories(test_qxi PUBLIC .)
-    # Pull in our pico_stdlib which aggregates commonly used features
-    target_link_libraries(test_qxi pico_stdlib hardware_spi middleware)
-
-    # enable usb output, disable uart output
-    pico_enable_stdio_usb(test_qxi 1)
-    pico_enable_stdio_uart(test_qxi 0)
-
-    # create map/bin/hex/uf2 file etc.
-    pico_add_extra_outputs(test_qxi)
+    add_subdirectory(pac193x)
+    add_subdirectory(gpio)
+    add_subdirectory(i2c)
 
     ###########################################################
     # creates test_middleware executable
-    add_executable(test_middleware test_middleware.c data_set.c)
+    add_executable(test_middleware test_middleware.c stub_skeleton.c)
     target_include_directories(test_middleware PUBLIC .)
     # Pull in our pico_stdlib which aggregates commonly used features
-    target_link_libraries(test_middleware pico_stdlib hardware_spi middleware)
+    target_link_libraries(test_middleware pico_stdlib 
+            pico_time
+            hardware_i2c 
+            hardware_spi 
+            middleware 
+            sensor_lib_pac193x)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(test_middleware 1)
