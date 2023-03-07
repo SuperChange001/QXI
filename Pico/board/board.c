@@ -2,10 +2,12 @@
 #include <pico/bootrom.h>
 #include "pac193x/Pac193x.h"
 #include "pac193x/Pac193xTypedefs.h"
+#include "middleware.h"
 
 pac193xPowerMeasurements_t sensor1_measurements;
 pac193xPowerMeasurements_t sensor2_measurements;
 
+uint8_t fpga_power_state = 0;
 static pac193xSensorConfiguration_t sensor1 = {
     .i2c_host = i2c1,
     .i2c_slave_address = PAC193X_I2C_ADDRESS_499R,
@@ -68,6 +70,15 @@ void fpga_flash_spi_deinit() {
     gpio_set_dir(SPI_FPGA_FLASH_MOSI, GPIO_IN);
     gpio_init(SPI_FPGA_FLASH_SCK);
     gpio_set_dir(SPI_FPGA_FLASH_SCK, GPIO_IN);
+
+    gpio_init(13);
+    gpio_set_dir(13, GPIO_IN);
+    gpio_init(14);
+    gpio_set_dir(14, GPIO_IN);
+    gpio_init(15);
+    gpio_set_dir(15, GPIO_IN);
+    gpio_init(20);
+    gpio_set_dir(20, GPIO_IN);
 }
 
 void fpga_powers_init() {
@@ -80,9 +91,13 @@ void fpga_powers_init() {
     gpio_init(FPGA_MOS_EN_PIN);
     gpio_set_dir(FPGA_MOS_EN_PIN, GPIO_OUT);
     gpio_put(FPGA_MOS_EN_PIN, 1);
+    fpga_reset(1);
 }
 
 void fpga_powers_on() {
+    gpio_init(12);
+    gpio_set_dir(12, GPIO_OUT);
+    gpio_put(12, 1);
     // voltage regulator on
     gpio_put(FPGA_VOL_REGULATOR_EN_PIN, 1);
 
@@ -90,14 +105,25 @@ void fpga_powers_on() {
 
     // MOS FETS on
     gpio_put(FPGA_MOS_EN_PIN, 0);
+
+    middleware_init();
+    fpga_power_state=1;
 }
 
 void fpga_powers_off() {
-    // voltage regulator on
+    // voltage regulator off
     gpio_put(FPGA_VOL_REGULATOR_EN_PIN, 0);
 
-    // MOS FETS on
+    // MOS FETS off
     gpio_put(FPGA_MOS_EN_PIN, 1);
+
+    middleware_deinit();
+
+    gpio_init(12);
+    gpio_set_dir(12, GPIO_OUT);
+    gpio_put(12, 0);
+
+    fpga_power_state=0;
 }
 
 void fpga_reset(unsigned int reset_en) {
@@ -170,4 +196,9 @@ void send_power_measurements(void)
     sensor2_measurements.powerChannel3/sensor1_measurements.counterOfMeasurements,
     sensor2_measurements.powerChannel4/sensor1_measurements.counterOfMeasurements
     );
+}
+
+uint8_t get_fpga_power_state(void)
+{
+    return fpga_power_state;
 }

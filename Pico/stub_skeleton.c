@@ -14,12 +14,12 @@ uint8_t skeleton_get_id()
 void skeleton_switch(uint8_t id)
 {
 
-    if(id==0x05)
+    if(id==0x04)
     {
         middleware_configure_fpga(0x0000);
     }
 
-    else if(id==0x16)
+    else if(id==0x14)
     {
         middleware_configure_fpga(0x00100000);
     }
@@ -30,9 +30,9 @@ void skeleton_switch(uint8_t id)
 
     sleep_ms(200);
 
-    if(skeleton_get_id()!=id)
+    if(skeleton_get_id()==id)
     {
-        printf("d, switched to model 1\r\n");
+        printf("d, switched model success\r\n");
     }
     else
     {

@@ -34,7 +34,7 @@ void qxi_deinit(void)
     gpio_set_function(QXI_SPI_RX_PIN, GPIO_FUNC_NULL);
     gpio_set_function(QXI_SPI_TX_PIN, GPIO_FUNC_NULL);
     gpio_set_function(QXI_SPI_SCK_PIN, GPIO_FUNC_NULL);
-    gpio_set_function(QXI_SPI_CS_PIN, GPIO_FUNC_NULL);
+    gpio_put(QXI_SPI_CS_PIN, 0);
 }
 
 void qxi_set_speed(uint baudrate)

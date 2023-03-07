@@ -4,8 +4,9 @@
 
 #include <stdbool.h>
 #include "pico/stdlib.h"
-#include "pico/stdio.h"
+#include "stdio.h"
 #include <hardware/i2c.h>
+
 
 #define LED0_PIN 22
 #define LED1_PIN 24
@@ -44,4 +45,5 @@ void power_sensors_init(void);
 void power_sensors_update(void);
 void power_sensors_start(void);
 void send_power_measurements(void);
+uint8_t get_fpga_power_state(void);
 #endif
