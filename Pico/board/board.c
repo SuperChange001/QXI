@@ -191,11 +191,12 @@ void send_power_measurements(void)
     sensor1_measurements.powerChannel2/sensor1_measurements.counterOfMeasurements,
     sensor1_measurements.powerChannel3/sensor1_measurements.counterOfMeasurements,
     sensor1_measurements.powerChannel4/sensor1_measurements.counterOfMeasurements,
-    sensor2_measurements.powerChannel1/sensor1_measurements.counterOfMeasurements,
-    sensor2_measurements.powerChannel2/sensor1_measurements.counterOfMeasurements,
-    sensor2_measurements.powerChannel3/sensor1_measurements.counterOfMeasurements,
-    sensor2_measurements.powerChannel4/sensor1_measurements.counterOfMeasurements
+    sensor2_measurements.powerChannel1/sensor2_measurements.counterOfMeasurements,
+    sensor2_measurements.powerChannel2/sensor2_measurements.counterOfMeasurements,
+    sensor2_measurements.powerChannel3/sensor2_measurements.counterOfMeasurements,
+    sensor2_measurements.powerChannel4/sensor2_measurements.counterOfMeasurements
     );
+//    printf("d, FPGA total power %4.6f\r\n",(sensor2_measurements.powerChannel2+sensor2_measurements.powerChannel3)/sensor2_measurements.counterOfMeasurements);
 }
 
 uint8_t get_fpga_power_state(void)

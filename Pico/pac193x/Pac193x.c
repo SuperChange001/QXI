@@ -462,6 +462,7 @@ static pac193xErrorCode_t pac193xInternalRefreshV(pac193xSensorConfiguration_t s
     }
 
     /* sleep because sensor is unreachable for 1ms after refresh */
+//    sleep_ms(1);
     sleep_ms(1);
 
     PRINT_DEBUG("pac193xInternalRefreshV successful")
